@@ -16,8 +16,6 @@
   <a href="https://x.com/TocoAI"><img src="https://img.shields.io/badge/X-@TocoAI-000000?style=for-the-badge" alt="X" /></a>
 </p>
 
-[Apply for Early Access (30,000 Free Credits for Month 1)](https://tocoai.dev/) | [Official Docs](https://tocoai.dev/) | [Discord Community](https://discord.gg/NubsdbF3MK) | [Follow on X](https://x.com/TocoAI)
-
 <p align="center">
   <img src="assets/hero.gif" alt="TocoAI: More Reliable AI Architect -> More Controllable Backend Code -> >Easier Backend Changes<" width="800" />
 </p>
@@ -27,7 +25,8 @@
 ---
 
 > [!TIP]
-> 💡 **A Heartfelt Note from the TocoAI Team**
+> **A Heartfelt Note from the TocoAI Team**
+> 
 > Thanks for checking us out! Our original intention for building TocoAI was simple: we were tired of AI writing code that completely ignores system architecture, and we were exhausted from debugging AI-generated code line by line. We hope this tool frees you from the daily grind of patching up messy code and gives you your time back to focus on actual business design. Join us in building a more reliable standard for AI-assisted development! 🚀
 
 ---
