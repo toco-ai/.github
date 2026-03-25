@@ -1,6 +1,11 @@
 <h1 align="center">Toco AI</h1>
 
 <p align="center">
+  <strong>TocoAI: Stop Vibe Coding. A Model-Driven AI Coding Tool.</strong>
+  <strong>Model first, code later. Say goodbye to guesswork-based AI programming.</strong>
+</p>
+
+<p align="center">
   <b><a href="https://github.com/toco-ai/toco-ai/blob/main/README.md">English</a> | <a href="https://github.com/toco-ai/toco-ai/blob/main/README.ja-JP.md">日本語</a> | <a href="https://github.com/toco-ai/toco-ai/blob/main/README.zh-CN.md">中文 (Simplified)</a></b>
 </p>
 
@@ -11,18 +16,17 @@
   <a href="https://x.com/TocoAI"><img src="https://img.shields.io/badge/X-@TocoAI-000000?style=for-the-badge" alt="X" /></a>
 </p>
 
-
-> **TocoAI: Stop Vibe Coding. A Model-Driven AI Coding Tool.**
-> Model first, code later. Say goodbye to guesswork-based AI programming.
-
 [Apply for Early Access (30,000 Free Credits for Month 1)](https://tocoai.dev/) | [Official Docs](https://tocoai.dev/) | [Discord Community](https://discord.gg/NubsdbF3MK) | [Follow on X](https://x.com/TocoAI)
+
+<p align="center">
+  <img src="assets/hero.gif" alt="TocoAI: More Reliable AI Architect -> More Controllable Backend Code -> >Easier Backend Changes<" width="800" />
+</p>
+
+*<p align="center">👆 <b>More Reliable AI Architect</b> ➔ <b>More Controllable Backend Code</b> ➔ <b>Easier Backend Changes</b></p>*
 
 ---
 
-### ⏱️ Toco AI in 10 Seconds
-![TocoAI: Requirements -> Model -> 80% Deterministic Code Quick Demo|348](https://tocoai-asset.oss-cn-hangzhou.aliyuncs.com/assets/toco-hero-demo.gif)
-*<p align="center">👆 <b>More Reliable AI Architect</b> ➔ <b>More Controllable Backend Code</b> ➔ <b>Easier Backend Changes</b></p>*
-
+> [!TIP]
 > 💡 **A Heartfelt Note from the TocoAI Team**
 > Thanks for checking us out! Our original intention for building TocoAI was simple: we were tired of AI writing code that completely ignores system architecture, and we were exhausted from debugging AI-generated code line by line. We hope this tool frees you from the daily grind of patching up messy code and gives you your time back to focus on actual business design. Join us in building a more reliable standard for AI-assisted development! 🚀
 
