@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <img src="assets/hero.gif" alt="TocoAI: More Reliable AI Architect -> More Controllable Backend Code -> >Easier Backend Changes<" width="800" />
+  <img src="assets/hero_tocoai.gif" alt="TocoAI: More Reliable AI Architect -> More Controllable Backend Code -> >Easier Backend Changes<" width="800" />
 </p>
 
 *<p align="center">👆 <b>より信頼できるAIアーキテクト</b> ➔ <b>より制御可能なバックエンドコード</b> ➔ <b>より安全な仕様変更</b></p>*
