@@ -17,117 +17,161 @@
 </p>
 
 <p align="center">
-  <img src="assets/hero_tocoai.gif" alt="TocoAI: More Reliable AI Architect -> More Controllable Backend Code -> >Easier Backend Changes<" width="800" />
+  <img src="assets/hero_tocoai.gif" alt="TocoAI: More Reliable AI Architect -> More Controllable Backend Code -> Easier Backend Changes" width="800" />
 </p>
 
 *<p align="center">👆 <b>更可靠的AI架构师</b> ➔ <b>更可控的后端代码</b> ➔ <b>更轻松的后端变更</b></p>*
 
----
+<h2 align="center">TocoAI ：基于 DSL-Spec 的 backend harness</h2>
 
 > [!TIP]
-> **来自 TocoAI 团队的心里话**
-> 
-> 感谢关注！做 TocoAI 的初衷很简单：我们受够了 AI 无视架构乱写代码，也厌倦了给 AI 逐行排雷。希望这款工具能让你告别到处打补丁的日常，把精力真正还给业务设计。欢迎和我们一起，建立更可靠的 AI 研发规范！🚀
+> "形式化符号是排除各种胡说八道的极其有效的工具。自然语言 的'自然性'，不过是我们能轻松地用它说出那些荒谬性并不显而 易见的话。" — Edsger Dijkstra, EWD667, 1978 
 
----
+TocoAI是服务端研发的Harness Engineering方案。 
+在这，Spec不应是一次性生成代码的文本，而是控制系统的结构层。 
+我们用 DSL-Spec 约束大模型生成，并通过建模引擎约束结构性代码（约占80%）。 
 
-### 🎯 我们解决什么问题？
-现在用 AI 写代码（比如 Cursor 或 Claude Code），大家最怕遇到什么？
-1. **代码越改越乱**：只靠自然语言对话，AI 大模型无法维持对整个系统架构的长期记忆。改个小需求，大模型很容易破坏底层数据结构或漏改关联业务，导致代码逻辑和原有设计脱节。这就是为什么 TocoAI 必须引入可视化的**领域驱动设计（DDD）**，让可视化设计模型成为管住 AI 乱写代码的“标准图纸”与“操作底线”。
-2. **Review 到眼瞎**：不敢完全相信 AI 大模型，生成的每一行代码都要仔细盯，生怕埋了隐蔽的 Bug，心智负担极大。
+<p align="center">
+  <img src="assets/tocoai-arch.png" alt="TocoAI Archtecture" width="800" />
+</p>
 
-**Toco AI 的思路不一样：**
-我们不让 AI 大模型直接“猜”代码。而是让 AI 先把业务领域模型（包含实体、聚合、值对象等）和读写服务设计好，你确认这些可视化设计模型没问题后，系统再根据设计模型**确定性地**生成代码。
+### 我们的Harness Engineering思路 
+服务端是我们用来存储数据、还原流程的场景，需要长时间维护，更像是去建造一座大厦。我们希望 用建筑思维，而不是3D打印模式来构建我们的宏伟工程。 
 
----
+* 我们需要精准的设计图纸，于是我们定义了一套类DDD, 符合CQRS的DSL-SPEC 
+* 当AI辅助下，我们有了图纸设计，我们更希望有一致的、易于维护的代码结构，于是我们开发了一 个建模引擎，可以稳态的还原出和设计一致的结构性代码，这部分常在一个复杂项目中占到8成 
+* 后在一个结构稳固、水电接口齐全、图纸齐全的大楼里，我们用AI完成室内装修。那些难以DSL 化的，只能通过自然语言和代码表达的if/else部分 
 
-### ⚙️ 它是怎么工作的？
-为了消灭大模型生成代码的幻觉，Toco AI 把开发流拆成了两步：
+#### 1. DSL-SPEC​
+需求和架构设计不再散落在对话、文档或脑子里,也不是纯文本无法校验的随意表达,而是统一表达为结构化的 DSL Spec,作为整个系统的 Single Source of Truth。​
 
-```text
-      [ Natural Language Description / Reference Documents ]
-                         │
-                         ▼
-┌─────────────────────────────────────────────────┐
-│                 Toco AI Architect               │
-│ Output: Visual Models (Domain / R&W Services)   │
-└─────────────────────────────────────────────────┘
-                         │ (Models verified by you)
-                         ▼
-┌───────────────────────┐ ➕ ┌───────────────────────┐
-│ Internal Code Engine  │    │     AI Programmer     │
-│(Gen 80% Skeleton Code)│    │ (Fills 20% Core Logic)│
-│  Zero-hallucination,  │    │ e.g., complex checks/ │
-│    100% accurate      │    │    math calculations  │
-└───────────────────────┘    └───────────────────────┘
-            │                            │
-            ▼                            ▼
-   [ Clean, Standardized, and Maintainable Backend Code ]
+DSL 覆盖后端系统的完整设计层级:领域模型(Entity / Relation)、聚合对象(BO)、数据传输层(DTO / VO)、查询方案(ReadPlan / WO)、写入方案(WritePlan)、服务接口(API / RPC / Service)。​
+
+DSL 人类可读(提供UI展示界面),机器可解析。它不是配置文件——**它是可执行的架构意图**。​
+
+**DSL：**
+```JSON
+{
+    "dto": {
+        "uuid": null,
+        "name": "user_detail_dto",
+        "description": "User details including affiliated company and user settings list",
+        "fromEntity": "user",
+        "expandList": [
+            {
+                "foreignKeyInThisEntity": "company_id",
+                "dtoFieldName": "company",
+                "dto": {
+                    "uuid": null,
+                    "name": "company_base_dto",
+                    "fromEntity": "company",
+                    "description": "Basic company information"
+                }
+            }
+        ],
+        "reverseExpandList": [
+            {
+                "foreignKeyInOtherEntity": "user_id",
+                "dtoFieldName": "user_setting_list",
+                "dto": {
+                    "uuid": null,
+                    "name": "user_setting_base_dto",
+                    "fromEntity": "user_setting",
+                    "description": "Basic user setting information"
+                }
+            }
+        ]
+    }
+}
 ```
 
-1. **AI 帮你建模**：把业务文档喂给工具，AI 自动生成可视化的设计模型，并作为项目的永久记忆保存下来。
-2. **引擎生成 80% 骨架结构代码**：内置引擎把设计模型 1:1 翻译成符合 DDD（领域驱动设计）规范的骨架结构代码。**这部分代码是由引擎确定性生成的，0 幻觉，不用 Review**。
-3. **AI 填 20% 核心业务逻辑**：剩下的特定业务细节（如积分怎么扣、权限怎么卡），由 AI 程序员在骨架内填充。**你只需要盯着这 20% 的核心业务逻辑代码看就行**。
-4. **一处修改，全局同步**：需求变了？直接去修改可视化设计模型。系统会自动触发级联更新，**相关的领域模型、读写服务以及 80% 的骨架结构代码都会实现自动的级联同步与全量对齐**。随后，AI 程序员将自动在新的骨架内为您调整变更那 20% 的核心业务逻辑，极大降低漏改隐患。
+|Generated File|Purpose|
+|---|---|
+|UserDetailDto.java(~60 Lines)|DTO structure definition with nested Company and UserSetting list|
+|UserDetailDtoManager.java(~25 Lines)|Data access interface: getById, getByIdList, getByCompanyId|
+|UserDetailDtoManagerImpl.java(~125 Lines)|Implementation with batch query and N+1 prevention logic，Extension point for custom data access logic|
+|UserDetailDtoConverter.java(~80 Lines)|Entity → DTO field mapping and conversion|
+|UserDetailDtoService.java(~70 Lines)|Service layer with company forward-assembly and user_setting reverse-injection|
+|UserDetailDtoDataAssembler.java(~130 Lines)|Assembler, auto-handles nested relational data fetching，postProcessData extension point for custom post-processing|
 
----
+一种DSL简单示例(组装返回数据)
+​
+→更多 DSL 详细介绍​（TODO）
 
-### ⚔️ 和主流 AI 编辑器比一比
+#### 2. 建模引擎​
+引擎覆盖:分层骨架(persist / manager / service / entrance)、接口契约、数据模型、CQRS 命令查询拆分、跨层转换器(DtoConverter / VoConverter)、数据拼装器(DataAssembler)、聚合写链路(BoService)。
+开发者只需关注剩余 **20% 的业务逻辑**,Review 成本骤降一个数量级。​
 
-| 破局维度 | Toco AI (建模驱动) | 传统 AI 助手 (如 Cursor / Claude Code) |
-| --- | --- | --- |
-| **代码怎么来的** | **引擎 + 设计模型**：80% 的骨架结构代码由引擎确定性生成，架构清晰、符合规范且零幻觉。 | **全靠大模型猜**：完全靠提示词进行概率生成，容易跑偏。 |
-| **你的日常工作** | **做设计**：专注核心业务建模（领域模型/读写服务）、接口契约与顶层架构流转。 | **当审核员**：逐行查代码语法，到处排雷。 |
-| **Review 压力** | **做填空题**：审查成本大幅下降，只需看 20% 的核心业务逻辑。 | **改小作文**：每一行都得看，负担极重。 |
-| **改需求时** | **修改设计模型**：设计模型一变，代码与设计自动全量对齐同步。 | **到处打补丁**：纯靠文本让 AI 大模型找哪里该改，极易漏改。 |
+*→ 引擎机制详细介绍​（TODO）*
 
----
+#### 3. 标准的Human-in-Loop 
+AI从来不是神，在软件工程的世界里，我们需要在合适的地方作为他们的指导者，既不能过度干预， 但也绝不让他无约束的随意发挥。对于长时间影响的领域划分、数据结构定义、接口描述、读写方案 （事务约束、操作性能）我们提供标准的AI修改和手动修改相结合的手段。让AI始终是人的助理，而不 是主人。 
 
-### ⚡ 免费体验申请
-为了控制大模型的高昂算力成本，同时保证**稳定且高质量的生成体验**，Toco AI 现已全面开放免费体验申请。申请通过后，首月免费赠送 **30,000 Credits** 额度。
+### 对比、优势、案例 
 
-👉 **[前往官网申请免费体验](https://tocoai.dev/)**
+#### 对比 
+Cursor、Claude Code 是优秀的工具，我们不是它们的替代品。 
 
-⭐ **强烈建议您先 [Follow toco-ai 组织](https://github.com/toco-ai)，或加入 [Discord 社区](https://discord.gg/NubsdbF3MK)、关注 [官方 X 账号](https://x.com/TocoAI)。当产品发布重大更新或发放专属福利时，您将第一时间收到通知！**
+||Cursor / Claude Code|TocoAI|
+|---|---|---|
+|定位|对话式编程助手|后端工程 Harness|
+|代码来源|LLM 按 prompt 生成|DSL → 引擎确定性生成（80%）+ LLM 实现业务逻辑（20%）|
+|架构一致性|随迭代漂移|DSL 锁定，不随时间和人员变化|
+|变更方式|重新描述，人肉追踪影响范围|改 DSL，引擎自动级联同步|
+|Review 成本|全量代码|只审 20% 业务逻辑|
+|知识沉淀|对话用完即丢|DSL 即文档，可传承|
+|适用场景|原型、碎片化编码|复杂后端系统、长期多人协作|
 
-**获批后的极速启动步骤：**
-1. **安装插件**：支持主流 IDE，插件下载与详细配置请参考 [IntelliJ 官方安装指南](https://tocoai.dev/en/docs/installation) 或 [VS Code 官方安装指南](https://tocoai.dev/en/docs/installation-vscode)。
-   * **IntelliJ IDEA (2024.03+)**：进入 `Settings ➔ Plugins ➔ ⚙️ ➔ Install Plugin from Disk...` 选择下载的 `.zip` 安装包并重启。
-   * **VS Code (1.82.0+)**：在扩展面板选择 `Install from VSIX…` 安装下载的 `.vsix` 包并重启。
-2. **登录体验**：在 IDE 侧边栏打开 Toco AI 面板，登录账号。点击「**示例需求**」，即可体验从“需求 -> 建模 -> 出代码”的确定性极速闭环。
+>一句话： 写一个能跑的系统，用 Cursor。建一个能活三年的系统，用 TocoAI。 
 
----
+#### 核心优势 
+**结构稳定，不随时间漂移** DSL 是系统唯一的真相来源。无论迭代多少次、换多少人，生成的代码结构 始终和设计保持一致。 
 
-### 🔌 生态配合与全栈支持 (Ecosystem & Full-Stack)
-现代研发讲究工具链协同，Toco AI 致力于融入并赋能您的全栈开发流：
+**变更成本极低** 改一个字段、调整一个关系，引擎自动级联更新所有受影响的结构性代码。99% 的变更 无需额外 Review。 
 
-| 生态维度 / 场景 | 支持状态 | 核心工作模式与价值 |
-| ------ | ------ | ------ |
-| **后端工程 (MDD 模式)** | ✅ 灵活的全栈打法 | 新建 Toco Project 开启独创的模型驱动模式，专注处理基于数据库驱动的后端工程。在应对企业级后端工程与频繁需求变更时，其提效与防止代码越改越乱的优势将成倍放大。 |
-| **前端工程 (对话模式)** | ✅ 灵活的全栈打法 | 在非 Toco 项目中，Toco AI 无缝降级为类似 Claude Code 的增强型对话助手。其内置的后端 API MCP（模型上下文协议）能力，让前端开发也能精准感知后端接口契约。 |
-| **多语言支持** | 🚧 高速开发中 | MDD 引擎目前已深度支持 Java Spring 体系，基于 Go / Python / Node.js 的架构生成引擎正在高速开发中。 |
-| **MCP 协议广度生态** | 📅 规划中 | 未来，借助 MCP 生态协议，Toco AI 将支持更丰富的自定义能力扩展，让您可以无缝接入企业的私有开发工具链、内部知识库以及更多的外部功能套件，打通全栈协同中枢。 |
-| **Agent Skills (智能体技能集市)** | 📅 规划中 | 开放自定义技能，你可以把团队常用的开发 SOP 写成 Agent 技能，在社区共享“怎么让 AI 干活”的经验。 |
+**新人上手快** DSL 是可视化的架构文档。新成员不需要啃代码猜意图，看 DSL 一天内可以理解项目全 
 
----
+**团队协作有标准** 代码风格由引擎统一，不依赖个人 prompt 技巧和 Code Review 约定。团队越大，优势越明显。 
 
-### 🔒 隐私与安全
-你的代码只属于你，我们为核心业务资产提供最高规格的保护：
-* **数据主权承诺**：默认情况下，你的本地代码绝不会被擅自上传，且业务需求、生成的可视化设计模型和代码，绝不会被我们拿去训练公共 AI 大模型。除非你主动在偏好设置中选择开启数据共享，且即便开启，所有数据也会经过严格的去标识化与匿名化处理。
-* **支持私有化**：支持企业级私有化部署，数据全落盘在本地或你信任的私有云环境。
-* **云端基建安全**：平台数据落盘于业界顶级的云数据中心（AWS / Google Cloud 等），通过严格的网络隔离设计，确保工程文件的高可用与隐私的强隔离保护。
+#### 真实案例 
 
----
+**大型医院 HIS 系统:**
 
-### 🤝 欢迎来社区玩
-我们希望和开发者一起，建立更好的 AI 研发规范：
+**背景**：新一代全院管理系统，120+ 核心模块，200+ 业务流程，多团队并行开发。 
 
-* **贡献 `.toco` 规则**：欢迎在 [toco-rules-library](https://github.com/toco-ai/toco-rules-library) 仓库提交和优化 **TocoAI 各个 Agent（如领域架构师、规划者、开发者等）的规则提示词模板**。
-* **抄作业与最佳实践**：去 [toco-domain-models](https://github.com/toco-ai/toco-domain-models) 仓库获取电商、医疗等真实场景的参考设计模型；在官方聚合仓库 [awesome-tocoai](https://github.com/toco-ai/awesome-tocoai) 探索由社区贡献的完整项目源码与架构模板。
+**难点**：医疗业务零容错，多人跨时间协作极易产生逻辑漏洞和技术债。 
 
----
+**结果**：架构规范统一执行，生成代码准确率显著提升，整体项目AI代码采纳率近97%。交接时新成员 可快速上手项目全局。 
 
-**Stop Vibe Coding. Start Deterministic Engineering.**
+*→ 案例详细介绍（TODO）*
 
-👇 **[点击这里申请免费体验](https://tocoai.dev/)，或加入 [Discord 社区](https://discord.gg/NubsdbF3MK) 和大家聊聊！**
-[关注 @TocoAI 最新动态获取第一手资讯](https://x.com/TocoAI)
+**金融保证金支付系统重构：**
+
+**背景**：重构遗留保证金支付系统，原技术栈为 SQLServer 2008 + 大量存储过程 + 多个三方中间件。 
+
+**难点**：业务流程散落，数据和业务关联关系不明，性能瓶颈明显。 
+
+**结果**：通过 DSL 重新建模，业务关联关系显式化，端到端流程可追溯，系统可在 TocoAI 框架下持续 迭代。 
+
+### 适应场景及发展方向 
+
+#### DSL 描述的局限性 
+当前只适合描述关系型数据库驱动的后端系统。我们会持续深耕这个领域。 
+但 Harness Engineering 的思路本身是通用的——在嵌入式、前端组件、基础设施配置等场景同样适 用，只是需要针对那些领域重新定义 DSL 语言。期待其他团队在各自领域延伸这个思路。 
+
+#### DSL 的完备性 
+我们实现了一套可运行的基础 DSL，但它不是终点。表达力的边界只有在广泛使用和讨论中才会被发现。 
+**我们愿意开源，和社区一起共建新的 DSL 表达能力。** 
+
+#### 引擎的约束性 
+引擎的深层含义是"设计时固化"。优秀的 Harness 能力和约束性是同一枚硬币的两面。 
+我们的解法：一是**开源共建**，开放引擎规则层让社区扩展；二是**基于 LLM 维护引擎规则**，降低规则修改周期，让引擎的演化速度跟上真实需求。 
+
+#### 老项目的兼容 
+可以在老项目中开发新模块，但存量遗留代码的整体接管不在我们的覆盖范围内。 
+**重构是 AI 时代的日常工作**。AI 大幅降低了重构成本，正确的路径是用新模块承接新需求，逐步把老逻 辑迁移进 DSL 管辖的范围，而不是等待一个"大重构"时机。 
+
+没有完美的技术，只有适应的场景，一部分是在我们深耕的赛道，我们会矢志不渝坚持下去；一部分 是希望和有同样理解的朋友一起共创的世界。 
+毕竟AI改变研发才一年，但软件开发本身已经有七、八十年的历史。 
+
+Getting Started-> 
