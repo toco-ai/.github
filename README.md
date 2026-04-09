@@ -1,133 +1,322 @@
-<h1 align="center">Toco AI</h1>
+<div align="center">
 
-<p align="center">
-  <strong>TocoAI: Stop Vibe Coding. A Model-Driven AI Coding Tool.</strong>
-  <strong>Model first, code later. Say goodbye to guesswork-based AI programming.</strong>
-</p>
+**English** · [日本語](./README.ja-JP.md) · [简体中文](./README.zh-CN.md)
 
-<p align="center">
-  <b><a href="https://github.com/toco-ai/toco-ai/blob/main/README.md">English</a> | <a href="https://github.com/toco-ai/toco-ai/blob/main/README.ja-JP.md">日本語</a> | <a href="https://github.com/toco-ai/toco-ai/blob/main/README.zh-CN.md">中文 (Simplified)</a></b>
-</p>
+<img height="100" alt="TocoAI" src="assets/logo.png" />
 
-<p align="center">
-  <a href="https://tocoai.dev/en/docs/installation"><img src="https://img.shields.io/badge/IntelliJ_IDEA-2024.03+-blue?style=for-the-badge" alt="IntelliJ IDEA" /></a>
-  <a href="https://tocoai.dev/en/docs/installation-vscode"><img src="https://img.shields.io/badge/VS_Code-1.82.0+-blue?style=for-the-badge" alt="VS Code" /></a>
-  <a href="https://discord.gg/NubsdbF3MK"><img src="https://img.shields.io/badge/Discord-Join_Community-5865F2?style=for-the-badge" alt="Discord" /></a>
-  <a href="https://x.com/TocoAI"><img src="https://img.shields.io/badge/X-@TocoAI-000000?style=for-the-badge" alt="X" /></a>
-</p>
+<h1>TocoAI：Server-side Harness Engineering based on DSL-Spec</h1>
 
-<p align="center">
-  <img src="assets/hero_tocoai.gif" alt="TocoAI: More Reliable AI Architect -> More Controllable Backend Code -> >Easier Backend Changes<" width="800" />
-</p>
 
-*<p align="center">👆 <b>More Reliable AI Architect</b> ➔ <b>More Controllable Backend Code</b> ➔ <b>Easier Backend Changes</b></p>*
+[![][docs-shield]][docs-link]
+[![][license-shield]][license-link]
+[![][stack-shield]][stack-link]
+[![][engine-shield]][engine-link]
+
+<br/>
+
+[![][github-stars-shield]][github-stars-link]
+[![][github-issues-shield]][github-issues-link]
+[![][github-contributors-shield]][github-contributors-link]
+
+
+</div>
 
 ---
+
+TocoAI is a **Harness Engineering** solution for server-side development. A Spec should not be a one-off artifact for code generation — it is the **structural control layer** of the system.
+
+- Constrain LLM generation through **DSL-Spec**, keeping it continuously consistent with the code.
+
+- Deterministically render structural code through the **Modeling Engine**, ensuring the codebase stays stable and drift-free.
+
+Let AI always work under human design intent in server-side projects that require long-term iterative maintenance.
+
+<video src="https://github.com/user-attachments/assets/9c3dab56-f927-42d6-83c0-77a25ff65ecc" controls width="100%"></video>
 
 > [!TIP]
-> **A Heartfelt Note from the TocoAI Team**
-> 
-> Thanks for checking us out! Our original intention for building TocoAI was simple: we were tired of AI writing code that completely ignores system architecture, and we were exhausted from debugging AI-generated code line by line. We hope this tool frees you from the daily grind of patching up messy code and gives you your time back to focus on actual business design. Join us in building a more reliable standard for AI-assisted development! 🚀
+> Use Cursor to make it work. Use TocoAI to make it last.
+
+<details>
+<summary><kbd>Table of Contents</kbd></summary>
+
+- [🚀 Quick Start](#-quick-start)
+- [🏗️ Harness Engineering](#️-harness-engineering)
+- [⚙️ Core Components](#️-core-components)
+  - [📐 DSL-Spec](#-dsl-spec)
+  - [🔧 Modeling Engine](#-modeling-engine)
+  - [🧭 Human-in-the-Loop](#-human-in-loop)
+- [⚖️ Comparison with Other Tools](#️-comparison-with-other-tools)
+- [🎬 Demo Cases](#-demo-cases)
+- [📋 Real Cases](#-real-cases)
+- [🗺️ Applicable Scenarios & Limitations](#️-applicable-scenarios--limitations)
+- [🤝 Community & Participation](#-community--participation)
+
+</details>
 
 ---
 
-### 🎯 What Problem Are We Solving?
-When using AI code generators today (like Cursor or Claude Code), what are developers most afraid of?
-1. **The Codebase Degrading Over Time**: Relying solely on natural language prompts means LLMs cannot maintain long-term memory of your entire system architecture. A minor feature change can easily cause the LLM to break underlying data structures or miss related business logic, decoupling the code from its original design. That's why TocoAI introduces visual **Domain-Driven Design (DDD)**. The visual design model acts as the "standard blueprint" and "absolute baseline" to keep AI from writing rogue code.
-2. **Review Fatigue**: Because you can't fully trust the LLM, you end up scrutinizing every single line generated, terrified of hidden bugs. The cognitive load is immense.
+## 🚀 Quick Start
 
-**Toco AI takes a different approach:**
-We don't let the LLM just "guess" the code. Instead, we have the AI first design the business domain models (Entities, Aggregates, Value Objects, etc.) and read/write services. Once you verify that these visual design models are correct, the system generates the code **deterministically** based on the model.
+- Install & Configure
+  - [IntelliJ Plugin →][intellij-link]
+  - [VS Code Plugin →][vscode-link]
+- [DSL-Spec Syntax Reference →][dsl-docs-link]
 
 ---
 
-### ⚙️ How Does It Work?
-To eliminate code-generation hallucinations, Toco AI splits the development flow into two distinct steps:
+## 🏗️ Harness Engineering
 
-```text
-      [ Natural Language Description / Reference Documents ]
-                         │
-                         ▼
-┌─────────────────────────────────────────────────┐
-│                 Toco AI Architect               │
-│ Output: Visual Models (Domain / R&W Services)   │
-└─────────────────────────────────────────────────┘
-                         │ (Models verified by you)
-                         ▼
-┌───────────────────────┐ ➕ ┌───────────────────────┐
-│ Internal Code Engine  │    │     AI Programmer     │
-│(Gen 80% Skeleton Code)│    │ (Fills 20% Core Logic)│
-│  Zero-hallucination,  │    │ e.g., complex checks/ │
-│    100% accurate      │    │    math calculations  │
-└───────────────────────┘    └───────────────────────┘
-            │                            │
-            ▼                            ▼
-   [ Clean, Standardized, and Maintainable Backend Code ]
+Server-side systems require long-term maintenance — they are more like constructing a building than 3D printing. We apply **architectural thinking** to build them:
+
+- We need precise blueprints — so we defined a **DSL-Spec** aligned with DDD and CQRS
+- With blueprints in place, we needed consistent and maintainable code structure — so we built the **Modeling Engine**, which deterministically renders structural code, accounting for roughly **80%** of a complex project
+- Finally, inside a structurally sound building with all interfaces in place, we let AI handle the interior work — the if/else business logic that is hard to express in DSL-Spec
+
+<div align="center">
+
+<img src="assets/tocoai-arch.PNG" alt="TocoAI Architecture" width="100%"/>
+
+</div>
+
+---
+
+## ⚙️ Core Components
+
+### 📐 DSL-Spec
+
+> *"The use of formal symbols is an extremely effective tool for excluding all sorts of nonsense. The 'naturalness' of natural language is precisely our ability to say things whose absurdity is not immediately obvious."*
+>
+> — Edsger Dijkstra, EWD667, 1978
+
+Requirements and architecture design are expressed uniformly as a structured DSL-Spec, serving as the **Single Source of Truth** for the entire system. DSL-Spec is human-readable and machine-parseable. It is not a configuration file — **it is executable architectural intent**.
+
+|  | Natural Language Spec | Programmatic IaC | **DSL-Spec** |
+|--|:---------------------:|:----------------:|:------------:|
+| **Clear meaning, readable** | Anyone can read it, but ambiguity only surfaces in production incidents | Precise, but requires understanding the execution flow to grasp intent | ✅ As readable as natural language, as precise as code — ambiguity is a compile error |
+| **Clear details (What + How)** | Only vague What — How is left entirely to AI improvisation | Only How — architectural intent is buried in execution logic | ✅ What (data intent) and How (structural constraints) are both explicitly expressed |
+| **Verifiable, maintainable** | Not machine-verifiable; changing a field requires manual impact tracking | Executable but no independent intent layer; change impact requires analysis tools | ✅ Machine-parseable and verifiable; change the DSL-Spec and the engine auto-cascades all affected structures |
+| **Always consistent with code** | Accurate at launch, drifts in 3 months, becomes history in 6 | Code is the implementation, but architectural intent is lost over iterations | ✅ The relationship between Spec and code is always `=`, never `≈` |
+
+<br/>
+
+DSL-Spec covers the complete design hierarchy of server-side systems:
+
+| Layer | Elements |
+|-------|----------|
+| **Domain Model** | Entity / Relation / Enum / EO (Value Object) |
+| **Aggregate** | BO / Domain Events |
+| **Data Transfer** | DTO / VO |
+| **Query Plan** | ReadPlan |
+| **Write Plan** | WritePlan (Based on BO) |
+| **Flow Plan** | FuncFlow (task orchestration) / Message management |
+| **Service Interface** | API / RPC / Service |
+
+<br/>
+
+A single DTO DSL-Spec definition auto-generates:
+
+<table>
+<tr>
+<th width="22%">Vague Requirement</th>
+<th width="50%">DSL-Spec</th>
+<th width="28%">Auto-Generated Files</th>
+</tr>
+<tr>
+<td>
+
+*"Room type info, including its corresponding rooms — plus available room count."*
+
+| Ambiguity | DSL decision |
+|---|---|
+| Which entity is the root? | `fromEntity: room_type` |
+| How are rooms related? | `room.room_type_id` FK → **reverse injection** |
+| Where does `available_count` come from? | No entity field → `customField` |
+
+</td>
+<td>
+
+```json
+{
+  "dto": {
+    "name": "room_type_with_rooms_dto",
+    "fromEntity": "room_type",
+    "reverseExpandList": [{
+      "foreignKeyInOtherEntity": "room_type_id",
+      "dtoFieldName": "room_list",
+      "dto": { "name": "room_base_dto", "fromEntity": "room" }
+    }],
+    "customFieldList": [{
+      "name": "available_count",
+      "type": "Integer"
+    }]
+  }
+}
 ```
 
-1. **AI Models It For You**: Feed your business requirements to the tool, and the AI automatically generates visual design models, saving them as the permanent memory of your project.
-2. **Engine Generates 80% Skeleton Code**: Our built-in engine translates the design models 1:1 into skeleton code strictly adhering to DDD (Domain-Driven Design) standards. **This code is deterministically generated by the engine—zero hallucinations, no review required.**
-3. **AI Fills in the 20% Core Logic**: The remaining specific business details (e.g., how points are deducted, how permissions are gated) are filled into the skeleton by the AI Programmer. **You only need to review this 20% of core business logic.**
-4. **Change Once, Sync Everywhere**: Requirements changed? Just update the visual design model. The system will trigger a cascading update: **related domain models, read/write services, and the 80% skeleton code will automatically sync and align.** Afterward, the AI Programmer will automatically adjust the 20% core logic within the new skeleton, drastically reducing the risk of missed updates.
+</td>
+<td>
+
+```
+RoomTypeWithRoomsDto.java                (~60 Lines)
+RoomTypeWithRoomsDtoManager.java         (~25 Lines)
+RoomTypeWithRoomsDtoManagerImpl.java
+RoomTypeWithRoomsDtoConverter.java       (~80 Lines)
+RoomTypeWithRoomsDtoService.java         (~70 Lines)
+RoomTypeWithRoomsDtoDataAssembler.java
+RoomTypeWithRoomsDtoBaseDataAssembler.java
+```
+
+</td>
+</tr>
+</table>
+
+[View full DSL-Spec syntax documentation →][dsl-docs-link]
+
+<br/>
+
+### 🔧 Modeling Engine
+
+The engine covers generation of all structural code:
+
+- Layered skeleton (`persist` / `manager` / `service` / `entrance`)
+- Interface contracts and data models
+- CQRS command/query separation
+- Cross-layer converters (`DtoConverter` / `VoConverter`)
+- Data assemblers (`DataAssembler`)
+- Aggregate write chains (`BoService`)
+
+**Developers only write the remaining 20% of business logic** — review costs drop by an order of magnitude.
+
+> [!NOTE]
+> The essence of the Modeling Engine is shifting quality control **left to "design time"** — deterministically rendering the code framework defined by the DSL-Spec. Structural code is generated by the engine, not by an LLM on each iteration. This fundamentally eliminates AI's random errors and architectural drift. No matter how many iterations or how many team members, the foundational structure always stays consistent with the design.
+
+> [!IMPORTANT]
+> The engine is planned to be **open-sourced in the second half of 2026**.
+
+<br/>
+
+### 🧭 Human-in-the-Loop
+
+AI is not omniscient. For decisions with long-term impact — domain boundaries, data structure definitions, interface descriptions, read/write plans (transaction constraints, operation performance) — we provide a standard approach combining AI-assisted modification with manual control.
+
+**Keep AI as the assistant, not the decision-maker.**
 
 ---
 
-### ⚔️ Compared to Mainstream AI Editors
+## ⚖️ Comparison with Other Tools
 
-| Dimension | Toco AI (Model-Driven) | Traditional AI Assistants (Cursor / Claude Code) |
-| --- | --- | --- |
-| **How Code is Generated** | **Engine + Design Models**: 80% of skeleton code is deterministically generated by the engine. Clear architecture, standardized, zero hallucinations. | **Pure Guesswork**: Relies entirely on probabilistic generation via prompts. Easy to go off track. |
-| **Your Daily Workflow** | **Designing**: Focusing on core business modeling (Domain Models / Services), API contracts, and top-level architecture. | **Playing Auditor**: Checking syntax line-by-line, constantly hunting for bugs. |
-| **Review Pressure** | **Fill-in-the-blanks**: Review costs drop dramatically. You only look at the 20% core business logic. | **Editing an Essay**: You have to read every single line. Immense cognitive burden. |
-| **Handling Changes** | **Update the Model**: Change the design model, and the code automatically syncs and aligns with the new design. | **Patchwork**: Relying purely on text to tell the LLM what to fix. Highly prone to missing related changes. |
+Cursor and Claude Code are excellent general-purpose coding assistants — in fact, TocoAI uses them internally to implement business logic. We solve problems at a different level.
 
----
+> [!NOTE]
+> TocoAI is designed for: **relational database-driven server-side systems that require long-term iteration and multi-person collaboration**. If you are building a prototype, a script tool, or a frontend project, Cursor is enough.
 
-### ⚡ Apply for Early Access
-To manage the high compute costs of LLMs while guaranteeing a **stable and high-quality generation experience**, Toco AI is now open for Early Access applications. Once approved, you will receive **30,000 Credits for free** during your first month.
-
-👉 **[Apply for Early Access on our Website](https://tocoai.dev/)**
-
-⭐ **We highly recommend you [Follow the toco-ai Organization](https://github.com/toco-ai), join our [Discord Community](https://discord.gg/NubsdbF3MK), or follow our [Official X Account](https://x.com/TocoAI). You'll be the first to know about major updates and exclusive perks!**
-
-**Quick Start Guide (After Approval):**
-1. **Install the Plugin**: We support mainstream IDEs. For downloads and detailed configurations, please refer to our [IntelliJ Installation Guide](https://tocoai.dev/en/docs/installation) or [VS Code Installation Guide](https://tocoai.dev/en/docs/installation-vscode).
-   * **IntelliJ IDEA (2024.03+)**: Go to `Settings ➔ Plugins ➔ ⚙️ ➔ Install Plugin from Disk...`, select the downloaded `.zip` package, and restart.
-   * **VS Code (1.82.0+)**: Go to the Extensions panel, select `Install from VSIX…`, choose the `.vsix` package, and restart.
-2. **Log In and Experience**: Open the Toco AI panel in your IDE sidebar and log in. Click **"Example Requirements"** to experience the lightning-fast, deterministic loop from "Requirements -> Modeling -> Code".
+|  | Cursor / Claude Code | TocoAI |
+|--|:--------------------:|:------:|
+| **Role** | General-purpose conversational coding assistant | Server-side engineering Harness, structured solution for specific scenarios |
+| **Code origin** | LLM generates based on prompt | DSL-Spec → engine deterministic generation (80%) + LLM for business logic |
+| **Architectural consistency** | Maintained via prompt and review | Guaranteed by DSL-Spec + engine, no human dependency |
+| **Best fit** | Rapid prototyping, ad-hoc coding | Complex business systems requiring long-term maintenance |
+| **Team scale** | Best for individuals or small teams | The larger the team and the longer the iteration, the greater the advantage |
+| **Learning curve** | Almost none | Requires understanding DSL-Spec and modeling approach |
 
 ---
 
-### 🔌 Ecosystem & Full-Stack Support
-Modern development relies on seamless toolchains. Toco AI is designed to integrate into and supercharge your full-stack workflow:
+## 🎬 Demo Cases
 
-| Ecosystem / Scenario | Support Status | Core Workflow & Value |
-| ------ | ------ | ------ |
-| **Backend Engineering (MDD Mode)** | ✅ Flexible Full-Stack Playbook | Create a new Toco Project to unlock our exclusive Model-Driven Design mode, perfect for database-driven backend engineering. Its ability to boost efficiency and prevent codebase degradation multiplies when handling enterprise-level backends and frequent requirement changes. |
-| **Frontend Engineering (Chat Mode)** | ✅ Flexible Full-Stack Playbook | In non-Toco projects, Toco AI gracefully falls back into an enhanced conversational assistant (similar to Claude Code). Its built-in Backend API MCP (Model Context Protocol) capabilities allow frontend developers to accurately perceive backend API contracts. |
-| **Multi-Language Support** | 🚧 In Rapid Development | The MDD engine currently has deep support for the Java Spring ecosystem. Generation engines for Go / Python / Node.js architectures are under rapid development. |
-| **MCP Protocol Ecosystem** | 📅 Planned | In the future, leveraging the MCP ecosystem, Toco AI will support richer custom extensions. You'll be able to seamlessly plug into your company's private toolchains, internal knowledge bases, and external toolkits, bridging the full-stack collaborative hub. |
-| **Agent Skills Marketplace** | 📅 Planned | Open custom skills. You can convert your team's common development SOPs into Agent Skills and share your "how to make AI work for you" expertise with the community. |
+### BnB Short-term Rental Platform
 
----
+A complete short-term rental platform covering property management, shopping cart, order settlement, inventory validation, and membership points — demonstrating TocoAI's end-to-end workflow from requirements to delivery.
 
-### 🔒 Privacy & Security
-Your code belongs solely to you. We provide the highest level of protection for your core business assets:
-* **Data Sovereignty Guarantee**: By default, your local code is never uploaded without permission. Your business requirements, generated visual models, and code will **never** be used by us to train public AI models. Unless you actively opt into data sharing in your preferences—and even then, all data undergoes strict de-identification and anonymization.
-* **On-Premises Support**: We support enterprise-grade private deployments. Your data can reside entirely on your local servers or within your trusted private cloud environment.
-* **Cloud Infrastructure Security**: Platform data is stored in industry-leading cloud data centers (AWS / Google Cloud, etc.). Through strict network isolation design, we ensure high availability of your engineering files and robust protection of your privacy.
+**Business coverage:** Room inventory &nbsp;·&nbsp; Cart &nbsp;·&nbsp; Orders / Sub-orders &nbsp;·&nbsp; Payment &nbsp;·&nbsp; Points deduction &nbsp;·&nbsp; Consumption records
+
+[View full demo →][bnb-demo-link]
 
 ---
 
-### 🤝 Join the Community
-We want to work with developers to establish better AI engineering standards:
+## 📋 Real Cases
 
-* **Contribute `.toco` Rules**: Help us submit and optimize the **prompt templates for various TocoAI Agents (like Domain Architect, Planner, Developer, etc.)** in the [toco-rules-library](https://github.com/toco-ai/toco-rules-library) repository.
-* **Templates & Best Practices**: Visit the [toco-domain-models](https://github.com/toco-ai/toco-domain-models) repository to grab reference design models for real-world scenarios like e-commerce and healthcare. Explore complete project source codes and architectural templates contributed by the community in our official curated repo, [awesome-tocoai](https://github.com/toco-ai/awesome-tocoai).
+### Large Hospital HIS System
+
+**Background:** Next-generation hospital-wide management system, 120+ core modules, 200+ business processes, multi-team parallel development.
+
+**Challenge:** Zero tolerance for errors in medical business; multi-person cross-time collaboration easily produces logic gaps and technical debt.
+
+**Result:** Architecture standards enforced consistently; generated code accuracy significantly improved; overall project AI code adoption rate near **97%**; new team members can quickly understand the full project during handover.
+
+[View case details →][case-his-link]
+
+<br/>
+
+### Financial Margin Payment System Refactor
+
+**Background:** Refactoring a legacy margin payment system, originally built on SQLServer 2008 + stored procedures + multiple third-party middlewares.
+
+**Challenge:** Business processes scattered; data and business relationships unclear; significant performance bottlenecks.
+
+**Result:** Re-modeled via DSL-Spec, making business relationships explicit; end-to-end flows traceable; system can continue iterating under the TocoAI framework.
+
+[View case details →][case-finance-link]
 
 ---
 
-**Stop Vibe Coding. Start Deterministic Engineering.**
+## 🗺️ Applicable Scenarios & Limitations
 
-👇 **[Click here to apply for Early Access](https://tocoai.dev/) or join our [Discord Community](https://discord.gg/NubsdbF3MK) to chat with us!**
-[Follow @TocoAI on X for the latest news and updates.](https://x.com/TocoAI)
+All DSLs are **domain-specific**. They are only valid within a specific domain — there is no universal DSL that covers everything; forcing universality leads to reinventing a programming language. TocoAI's DSL-Spec only describes relational database-driven server-side systems. This is an intentional boundary, not a capability limitation.
+
+Even within a single domain, DSL-Spec is not meant to replace programming code. Our boundary is **DSL-Spec-ifying information that is suitable for structured description** — the rest of the business logic is left to programming languages and AI.
+
+**Legacy project compatibility:** New modules can be developed in legacy projects, but taking over all existing legacy code is out of scope. The right path is to handle new requirements with new modules and gradually migrate old logic into the DSL-Spec governed scope — **refactoring is daily work in the AI era**.
+
+The Harness Engineering approach itself is universal. We look forward to other teams extending it in their own domains — embedded systems, frontend components, infrastructure configuration — all can benefit from their own DSL-Spec.
+
+---
+
+## 🤝 Community & Participation
+
+- Visit [tocoai.dev][docs-link] for full documentation
+- Join the [Discord community][discord-link] to ask questions, discuss features, and share practices
+- Submit bug reports or feature suggestions on [GitHub Issues][github-issues-link]
+- The Modeling Engine is planned to open-source in **H2 2026** — star the repo to stay updated
+
+No technology is perfect; there are only scenarios it fits. After all, AI has only been changing software development for one year — but software development itself has a history of seventy or eighty years.
+
+[Contributing Guide →](CONTRIBUTING.md)
+
+---
+
+<div align="center">
+
+Copyright © 2025 TocoAI. Released under the [Apache 2.0][license-link] License.
+
+</div>
+
+<!-- LINK GROUP -->
+[docs-shield]: https://img.shields.io/badge/Docs-tocoai.dev-brightgreen?style=flat-square&color=73DC8C&labelColor=black
+[docs-link]: https://tocoai.dev/en/docs
+
+[license-shield]: https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square&color=4B78E6&labelColor=black
+[license-link]: LICENSE
+
+[stack-shield]: https://img.shields.io/badge/Stack-Java_|_Spring_Boot-orange?style=flat-square&color=ffcb47&labelColor=black
+[stack-link]: https://tocoai.cn
+
+[engine-shield]: https://img.shields.io/badge/Engine_OSS-H2_2026-pink?style=flat-square&color=FA9BFA&labelColor=black
+[engine-link]: https://tocoai.cn/docs/engine
+
+[github-stars-shield]: https://img.shields.io/github/stars/tocoai/toco?style=flat-square&color=ffcb47&labelColor=black&logo=github
+[github-stars-link]: https://github.com/tocoai/toco/stargazers
+
+[github-issues-shield]: https://img.shields.io/github/issues/tocoai/toco?style=flat-square&color=ff80eb&labelColor=black&logo=github
+[github-issues-link]: https://github.com/tocoai/toco/issues
+
+[github-contributors-shield]: https://img.shields.io/github/contributors/tocoai/toco?style=flat-square&color=c4f042&labelColor=black&logo=github
+[github-contributors-link]: https://github.com/tocoai/toco/graphs/contributors
+
+[intellij-link]: https://tocoai.dev/en/docs/installation
+[vscode-link]: https://tocoai.dev/en/docs/installation-vscode
+[dsl-docs-link]: ./assets/dsl.md
+[engine-docs-link]: https://tocoai.cn/docs/engine
+[bnb-demo-link]: https://tocoai.cn/docs/your-first-toco-project
+[case-his-link]: https://tocoai.cn/cases/his
+[case-finance-link]: https://tocoai.cn/cases/finance
+[discord-link]: https://tocoai.cn/discord
