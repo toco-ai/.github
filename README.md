@@ -74,7 +74,7 @@ Server-side systems require long-term maintenance — they are more like constru
 
 <div align="center">
 
-<img src="assets/tocoai-arch.PNG" alt="TocoAI Architecture" width="100%"/>
+<img src="assets/tocoai-arch.png" alt="TocoAI Architecture" width="100%"/>
 
 </div>
 
