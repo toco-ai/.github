@@ -1,177 +1,323 @@
-<h1 align="center">Toco AI</h1>
+<div align="center">
 
-<p align="center">
-  <strong>TocoAI: Stop Vibe Coding. 建模驱动的 AI Coding 工具。</strong>
-  <strong>先建模，后写代码。告别“开盲盒”式的 AI 编程。</strong>
-</p>
+[English](./README.md) · [日本語](./README.ja-JP.md) · **简体中文**
 
-<p align="center">
-  <b><a href="https://github.com/toco-ai/toco-ai/blob/main/README.md">English</a> | <a href="https://github.com/toco-ai/toco-ai/blob/main/README.ja-JP.md">日本語</a> | <a href="https://github.com/toco-ai/toco-ai/blob/main/README.zh-CN.md">中文 (Simplified)</a></b>
-</p>
+<img height="100" alt="TocoAI" src="assets/logo.png" />
 
-<p align="center">
-  <a href="https://tocoai.dev/en/docs/installation"><img src="https://img.shields.io/badge/IntelliJ_IDEA-2024.03+-blue?style=for-the-badge" alt="IntelliJ IDEA" /></a>
-  <a href="https://tocoai.dev/en/docs/installation-vscode"><img src="https://img.shields.io/badge/VS_Code-1.82.0+-blue?style=for-the-badge" alt="VS Code" /></a>
-  <a href="https://discord.gg/NubsdbF3MK"><img src="https://img.shields.io/badge/Discord-Join_Community-5865F2?style=for-the-badge" alt="Discord" /></a>
-  <a href="https://x.com/TocoAI"><img src="https://img.shields.io/badge/X-@TocoAI-000000?style=for-the-badge" alt="X" /></a>
-</p>
+<h1>TocoAI</h1>
 
-<p align="center">
-  <img src="assets/hero_tocoai.gif" alt="TocoAI: More Reliable AI Architect -> More Controllable Backend Code -> Easier Backend Changes" width="800" />
-</p>
+<h3>基于 DSL-Spec 的服务端 Harness Engineering</h3>
 
-*<p align="center">👆 <b>更可靠的AI架构师</b> ➔ <b>更可控的后端代码</b> ➔ <b>更轻松的后端变更</b></p>*
+[![][docs-shield]][docs-link]
+[![][license-shield]][license-link]
+[![][stack-shield]][stack-link]
+[![][engine-shield]][engine-link]
 
-<h2 align="center">TocoAI ：基于 DSL-Spec 的 backend harness</h2>
+<br/>
+
+[![][github-stars-shield]][github-stars-link]
+[![][github-issues-shield]][github-issues-link]
+[![][github-contributors-shield]][github-contributors-link]
+
+
+</div>
+
+---
+
+TocoAI 是服务端研发的 **Harness Engineering** 方案。Spec 不应是一次性生成代码的文本，而是**控制系统的结构层**。
+
+- 通过 **DSL-Spec** 约束大模型生成，并保持和代码持续一致。
+
+- 通过 **建模引擎** 稳态渲染结构性代码，使代码始终稳定不漂移
+
+让 AI 在持续迭代维护的服务端项目中始终在人的设计意图下工作。
+
+<video src="https://github.com/user-attachments/assets/9c3dab56-f927-42d6-83c0-77a25ff65ecc" controls width="100%"></video>
 
 > [!TIP]
-> "形式化符号是排除各种胡说八道的极其有效的工具。自然语言 的'自然性'，不过是我们能轻松地用它说出那些荒谬性并不显而 易见的话。" — Edsger Dijkstra, EWD667, 1978 
+> 写一个能跑的系统，用 Cursor。建一个能长期维护的系统，用 TocoAI。
 
-TocoAI是服务端研发的Harness Engineering方案。 
-在这，Spec不应是一次性生成代码的文本，而是控制系统的结构层。 
-我们用 DSL-Spec 约束大模型生成，并通过建模引擎约束结构性代码（约占80%）。 
+<details>
+<summary><kbd>目录</kbd></summary>
 
-<p align="center">
-  <img src="assets/tocoai-arch.png" alt="TocoAI Archtecture" width="800" />
-</p>
+- [🚀 快速开始](#-快速开始)
+- [🏗️ Harness Engineering 思路](#️-harness-engineering-思路)
+- [⚙️ 核心组件](#️-核心组件)
+  - [📐 DSL-Spec](#-dsl-spec)
+  - [🔧 建模引擎](#-建模引擎)
+  - [🧭 Human-in-the-Loop](#-human-in-loop)
+- [⚖️ 与其他工具的对比](#️-与其他工具的对比)
+- [🎬 演示案例](#-演示案例)
+- [📋 真实案例](#-真实案例)
+- [🗺️ 适用场景和局限性思考](#️-适用场景和局限性思考)
+- [🤝 社区与参与](#-社区与参与)
 
-### 我们的Harness Engineering思路 
-服务端是我们用来存储数据、还原流程的场景，需要长时间维护，更像是去建造一座大厦。我们希望 用建筑思维，而不是3D打印模式来构建我们的宏伟工程。 
+</details>
 
-* 我们需要精准的设计图纸，于是我们定义了一套类DDD, 符合CQRS的DSL-SPEC 
-* 当AI辅助下，我们有了图纸设计，我们更希望有一致的、易于维护的代码结构，于是我们开发了一 个建模引擎，可以稳态的还原出和设计一致的结构性代码，这部分常在一个复杂项目中占到8成 
-* 后在一个结构稳固、水电接口齐全、图纸齐全的大楼里，我们用AI完成室内装修。那些难以DSL 化的，只能通过自然语言和代码表达的if/else部分 
+---
 
-#### 1. DSL-SPEC​
-需求和架构设计不再散落在对话、文档或脑子里,也不是纯文本无法校验的随意表达,而是统一表达为结构化的 DSL Spec,作为整个系统的 Single Source of Truth。​
+## 🚀 快速开始
 
-DSL 覆盖后端系统的完整设计层级:领域模型(Entity / Relation)、聚合对象(BO)、数据传输层(DTO / VO)、查询方案(ReadPlan / WO)、写入方案(WritePlan)、服务接口(API / RPC / Service)。​
+- 安装和配置
+  - [IntelliJ Plugin →][intellij-link]
+  - [VS Code Plugin →][vscode-link]
+- [DSL-Spec 语法参考 →][dsl-docs-link]
 
-DSL 人类可读(提供UI展示界面),机器可解析。它不是配置文件——**它是可执行的架构意图**。​
+---
 
-**DSL：**
-```JSON
+## 🏗️ Harness Engineering 思路
+
+服务端系统需要长时间维护，更像是建造一座大厦，而不是 3D 打印。我们用**建筑思维**来构建：
+
+- 我们需要精准的设计图纸——于是定义了一套类 DDD、符合 CQRS 的 **DSL-Spec**
+- 图纸有了，我们更需要一致且可维护的代码结构——于是开发了**建模引擎**，稳态还原结构性代码，这部分在复杂项目中占到约 **80%**
+- 最后在结构稳固、接口齐全的大楼里，用 AI 完成室内装修——那些难以用 DSL-Spec 描述的 if/else 业务逻辑
+
+<div align="center">
+
+<img src="assets/tocoai-arch.png" alt="TocoAI 架构图" width="100%"/>
+
+</div>
+
+---
+
+## ⚙️ 核心组件
+
+### 📐 DSL-Spec
+
+> *"形式化符号是排除各种胡说八道的极其有效的工具。自然语言的'自然性'，不过是我们能轻松地用它说出那些荒谬性并不显而易见的话。"*
+>
+> — Edsger Dijkstra, EWD667, 1978
+
+需求和架构设计统一表达为结构化的 DSL-Spec，作为整个系统的 **Single Source of Truth**。DSL-Spec 人类可读，机器可解析。它不是配置文件——**它是可执行的架构意图**。
+
+|  | 自然语言 Spec | 程序式 IaC | **DSL-Spec** |
+|--|:------------:|:---------:|:----------:|
+| **含义明确、可读性强** | 人人能读，但歧义不报错，只在生产事故里现身 | 精确，但需理解执行流程才能看懂意图 | ✅ 像自然语言一样可读，像程序一样精确，模糊即编译错误 |
+| **细节清晰（What + How）** | 只有模糊的 What，How 全靠 AI 自由发挥 | 只有 How，架构意图藏在执行逻辑里无法单独审查 | ✅ What（数据意图）与 How（结构约束）同时显式表达 |
+| **可校验、易维护（变更可查）** | 机器无法校验，改一个字段靠人肉追踪影响范围 | 可执行但无独立意图层，变更影响面需依赖分析工具 | ✅ 机器可解析可校验，改 DSL-Spec，引擎自动级联同步所有受影响结构 |
+| **始终和代码一致** | 启动时准确，三个月漂移，六个月成历史文献 | 代码即实现，但架构意图随迭代逐渐丢失 | ✅ Spec 与代码的关系永远是 `=`，不是 `≈` |
+
+<br/>
+
+DSL-Spec 覆盖服务端系统的完整设计层级：
+
+| 层级 | 元素 |
+|------|------|
+| **领域模型** | Entity / Relation / Enum / EO (Value Object) |
+| **聚合对象** | BO / 领域事件 |
+| **数据传输层** | DTO / VO |
+| **查询方案** | ReadPlan |
+| **写入方案** | WritePlan (Based on BO) |
+| **流程方案** | FuncFlow（任务编排）/ 消息管理 |
+| **服务接口** | API / RPC / Service |
+
+<br/>
+
+一个 DTO 的 DSL-Spec 定义，自动生成：
+
+<table>
+<tr>
+<th width="22%">含糊需求</th>
+<th width="50%">DSL-Spec</th>
+<th width="28%">自动生成文件</th>
+</tr>
+<tr>
+<td>
+
+*"房型信息，包含对应的房间列表——另外还有可用房间数量。"*
+
+| 歧义点 | DSL 决策 |
+|---|---|
+| 根实体是哪个？ | `fromEntity: room_type` |
+| 房间如何关联？ | `room.room_type_id` 外键 → **反向注入** |
+| `available_count` 从哪来？ | 实体中无此字段 → `customField` |
+
+</td>
+<td>
+
+```json
 {
-    "dto": {
-        "uuid": null,
-        "name": "user_detail_dto",
-        "description": "User details including affiliated company and user settings list",
-        "fromEntity": "user",
-        "expandList": [
-            {
-                "foreignKeyInThisEntity": "company_id",
-                "dtoFieldName": "company",
-                "dto": {
-                    "uuid": null,
-                    "name": "company_base_dto",
-                    "fromEntity": "company",
-                    "description": "Basic company information"
-                }
-            }
-        ],
-        "reverseExpandList": [
-            {
-                "foreignKeyInOtherEntity": "user_id",
-                "dtoFieldName": "user_setting_list",
-                "dto": {
-                    "uuid": null,
-                    "name": "user_setting_base_dto",
-                    "fromEntity": "user_setting",
-                    "description": "Basic user setting information"
-                }
-            }
-        ]
-    }
+  "dto": {
+    "name": "room_type_with_rooms_dto",
+    "fromEntity": "room_type",
+    "reverseExpandList": [{
+      "foreignKeyInOtherEntity": "room_type_id",
+      "dtoFieldName": "room_list",
+      "dto": { "name": "room_base_dto", "fromEntity": "room" }
+    }],
+    "customFieldList": [{
+      "name": "available_count",
+      "type": "Integer"
+    }]
+  }
 }
 ```
 
-|Generated File|Purpose|
-|---|---|
-|UserDetailDto.java(~60 Lines)|DTO structure definition with nested Company and UserSetting list|
-|UserDetailDtoManager.java(~25 Lines)|Data access interface: getById, getByIdList, getByCompanyId|
-|UserDetailDtoManagerImpl.java(~125 Lines)|Implementation with batch query and N+1 prevention logic，Extension point for custom data access logic|
-|UserDetailDtoConverter.java(~80 Lines)|Entity → DTO field mapping and conversion|
-|UserDetailDtoService.java(~70 Lines)|Service layer with company forward-assembly and user_setting reverse-injection|
-|UserDetailDtoDataAssembler.java(~130 Lines)|Assembler, auto-handles nested relational data fetching，postProcessData extension point for custom post-processing|
+</td>
+<td>
 
-一种DSL简单示例(组装返回数据)
-​
-→更多 DSL 详细介绍​（TODO）
+```
+RoomTypeWithRoomsDto.java                (~60 Lines)
+RoomTypeWithRoomsDtoManager.java         (~25 Lines)
+RoomTypeWithRoomsDtoManagerImpl.java
+RoomTypeWithRoomsDtoConverter.java       (~80 Lines)
+RoomTypeWithRoomsDtoService.java         (~70 Lines)
+RoomTypeWithRoomsDtoDataAssembler.java
+RoomTypeWithRoomsDtoBaseDataAssembler.java
+```
 
-#### 2. 建模引擎​
-引擎覆盖:分层骨架(persist / manager / service / entrance)、接口契约、数据模型、CQRS 命令查询拆分、跨层转换器(DtoConverter / VoConverter)、数据拼装器(DataAssembler)、聚合写链路(BoService)。
-开发者只需关注剩余 **20% 的业务逻辑**,Review 成本骤降一个数量级。​
+</td>
+</tr>
+</table>
 
-*→ 引擎机制详细介绍​（TODO）*
+[查看完整 DSL-Spec 语法文档 →][dsl-docs-link]
 
-#### 3. 标准的Human-in-Loop 
-AI从来不是神，在软件工程的世界里，我们需要在合适的地方作为他们的指导者，既不能过度干预， 但也绝不让他无约束的随意发挥。对于长时间影响的领域划分、数据结构定义、接口描述、读写方案 （事务约束、操作性能）我们提供标准的AI修改和手动修改相结合的手段。让AI始终是人的助理，而不 是主人。 
+<br/>
 
-### 对比、优势、案例 
+### 🔧 建模引擎
 
-#### 对比 
-Cursor、Claude Code 是优秀的工具，我们不是它们的替代品。 
+引擎覆盖全部结构性代码的生成：
 
-||Cursor / Claude Code|TocoAI|
-|---|---|---|
-|定位|对话式编程助手|后端工程 Harness|
-|代码来源|LLM 按 prompt 生成|DSL → 引擎确定性生成（80%）+ LLM 实现业务逻辑（20%）|
-|架构一致性|随迭代漂移|DSL 锁定，不随时间和人员变化|
-|变更方式|重新描述，人肉追踪影响范围|改 DSL，引擎自动级联同步|
-|Review 成本|全量代码|只审 20% 业务逻辑|
-|知识沉淀|对话用完即丢|DSL 即文档，可传承|
-|适用场景|原型、碎片化编码|复杂后端系统、长期多人协作|
+- 分层骨架（`persist` / `manager` / `service` / `entrance`）
+- 接口契约与数据模型
+- CQRS 命令查询拆分
+- 跨层转换器（`DtoConverter` / `VoConverter`）
+- 数据拼装器（`DataAssembler`）
+- 聚合写链路（`BoService`）
 
->一句话： 写一个能跑的系统，用 Cursor。建一个能活三年的系统，用 TocoAI。 
+**开发者只需关注剩余 20% 的业务逻辑**，Review 成本骤降一个数量级。
 
-#### 核心优势 
-**结构稳定，不随时间漂移** DSL 是系统唯一的真相来源。无论迭代多少次、换多少人，生成的代码结构 始终和设计保持一致。 
+> [!NOTE]
+> 建模引擎的本质，是将软件工程的质量控制**左移到"设计时"**，将 DSL-Spec 定义的代码框架确定性地渲染生成。结构性代码由引擎生成，而非由大模型逐次生成——这从根本上消除了 AI 的随机错误和架构漂移。无论项目迭代多少轮、经手多少人，基础结构始终和设计保持一致，不会随时间腐化。
 
-**变更成本极低** 改一个字段、调整一个关系，引擎自动级联更新所有受影响的结构性代码。99% 的变更 无需额外 Review。 
+> [!IMPORTANT]
+> 引擎计划于 **2026 年下半年**开源。
 
-**新人上手快** DSL 是可视化的架构文档。新成员不需要啃代码猜意图，看 DSL 一天内可以理解项目全 
+<br/>
 
-**团队协作有标准** 代码风格由引擎统一，不依赖个人 prompt 技巧和 Code Review 约定。团队越大，优势越明显。 
+### 🧭 Human-in-the-Loop
 
-#### 真实案例 
+AI 从来不是神。对于对系统有长远影响的领域划分、数据结构定义、接口描述、读写方案（事务约束、操作性能），我们提供 AI 修改与手动修改相结合的标准手段。
 
-**大型医院 HIS 系统:**
+**让 AI 始终是人的助理，而不是主人。**
 
-**背景**：新一代全院管理系统，120+ 核心模块，200+ 业务流程，多团队并行开发。 
+---
 
-**难点**：医疗业务零容错，多人跨时间协作极易产生逻辑漏洞和技术债。 
+## ⚖️ 与其他工具的对比
 
-**结果**：架构规范统一执行，生成代码准确率显著提升，整体项目AI代码采纳率近97%。交接时新成员 可快速上手项目全局。 
+Cursor、Claude Code 是优秀的通用编程助手，事实上 TocoAI 内部也在使用它们实现业务逻辑。我们解决的是不同层面的问题。
 
-*→ 案例详细介绍（TODO）*
+> [!NOTE]
+> TocoAI 的设计场景是：**关系型数据库驱动的服务端系统，需要长期迭代、多人协作**。如果你在做原型验证、脚本工具、前端项目，Cursor 就够了。
 
-**金融保证金支付系统重构：**
+|  | Cursor / Claude Code | TocoAI |
+|--|:--------------------:|:------:|
+| **定位** | 通用对话式编程助手 | 服务端工程 Harness，特定场景的结构化解决方案 |
+| **代码来源** | LLM 按 prompt 生成 | DSL-Spec → 引擎确定性生成（80%）+ LLM 实现业务逻辑 |
+| **架构一致性** | 依赖 prompt 和 Review 维持 | 由 DSL-Spec + 引擎保证，不依赖人 |
+| **适合阶段** | 快速验证、原型、碎片化需求 | 需要长期维护的复杂业务系统 |
+| **团队规模** | 个人或小团队效果最好 | 团队越大、迭代越久，优势越明显 |
+| **学习成本** | 几乎没有 | 需要理解 DSL-Spec 和建模方式 |
 
-**背景**：重构遗留保证金支付系统，原技术栈为 SQLServer 2008 + 大量存储过程 + 多个三方中间件。 
+---
 
-**难点**：业务流程散落，数据和业务关联关系不明，性能瓶颈明显。 
+## 🎬 演示案例
 
-**结果**：通过 DSL 重新建模，业务关联关系显式化，端到端流程可追溯，系统可在 TocoAI 框架下持续 迭代。 
+### BnB 民宿预订系统
 
-### 适应场景及发展方向 
+一个完整的民宿预订平台，全链路覆盖房型管理、购物车、订单结算、库存校验、会员积分消费记录——用来演示 TocoAI 从需求到交付的完整工作流。
 
-#### DSL 描述的局限性 
-当前只适合描述关系型数据库驱动的后端系统。我们会持续深耕这个领域。 
-但 Harness Engineering 的思路本身是通用的——在嵌入式、前端组件、基础设施配置等场景同样适 用，只是需要针对那些领域重新定义 DSL 语言。期待其他团队在各自领域延伸这个思路。 
+**业务覆盖：** 房型库存 &nbsp;·&nbsp; 购物车 &nbsp;·&nbsp; 订单 / 子订单 &nbsp;·&nbsp; 支付 &nbsp;·&nbsp; 积分扣减 &nbsp;·&nbsp; 消费明细
 
-#### DSL 的完备性 
-我们实现了一套可运行的基础 DSL，但它不是终点。表达力的边界只有在广泛使用和讨论中才会被发现。 
-**我们愿意开源，和社区一起共建新的 DSL 表达能力。** 
+[查看完整演示 →][bnb-demo-link]
 
-#### 引擎的约束性 
-引擎的深层含义是"设计时固化"。优秀的 Harness 能力和约束性是同一枚硬币的两面。 
-我们的解法：一是**开源共建**，开放引擎规则层让社区扩展；二是**基于 LLM 维护引擎规则**，降低规则修改周期，让引擎的演化速度跟上真实需求。 
+---
 
-#### 老项目的兼容 
-可以在老项目中开发新模块，但存量遗留代码的整体接管不在我们的覆盖范围内。 
-**重构是 AI 时代的日常工作**。AI 大幅降低了重构成本，正确的路径是用新模块承接新需求，逐步把老逻 辑迁移进 DSL 管辖的范围，而不是等待一个"大重构"时机。 
+## 📋 真实案例
 
-没有完美的技术，只有适应的场景，一部分是在我们深耕的赛道，我们会矢志不渝坚持下去；一部分 是希望和有同样理解的朋友一起共创的世界。 
-毕竟AI改变研发才一年，但软件开发本身已经有七、八十年的历史。 
+### 大型医院 HIS 系统
 
-Getting Started-> 
+**背景：** 新一代全院管理系统，120+ 核心模块，200+ 业务流程，多团队并行开发。
+
+**难点：** 医疗业务零容错，多人跨时间协作极易产生逻辑漏洞和技术债。
+
+**结果：** 架构规范统一执行，生成代码准确率显著提升，整体项目 AI 代码采纳率近 **97%**，交接时新成员可快速上手项目全局。
+
+[查看案例详情 →][case-his-link]
+
+<br/>
+
+### 金融保证金支付系统重构
+
+**背景：** 重构遗留系统，原技术栈为 SQLServer 2008 + 大量存储过程 + 多个三方中间件。
+
+**难点：** 业务流程散落，数据和业务关联关系不明，性能瓶颈明显。
+
+**结果：** 通过 DSL-Spec 重新建模，业务关联关系显式化，端到端流程可追溯，系统可在 TocoAI 框架下持续迭代。
+
+[查看案例详情 →][case-finance-link]
+
+---
+
+## 🗺️ 适用场景和局限性思考
+
+所有 DSL 都是 **domain-specific** 的。它只在特定领域内有效，不存在能覆盖一切的通用 DSL——强行通用化的尽头是造出另一门编程语言。TocoAI 的 DSL-Spec 只描述关系型数据库驱动的服务端系统，这是有意为之的边界，不是能力限制。
+
+即使在单一领域内，DSL-Spec 也不是用来取代编程代码的。我们的边界是**把适合结构化描述的信息 DSL-Spec 化**，其余的业务逻辑交给编程语言和 AI。
+
+**老项目兼容：** 可以在老项目中开发新模块，存量遗留代码的整体接管不在覆盖范围内。正确的路径是用新模块承接新需求，逐步把老逻辑迁移进 DSL-Spec 管辖范围——**重构是 AI 时代的日常工作**。
+
+Harness Engineering 的思路本身是通用的，期待其他团队在各自领域延伸——嵌入式、前端组件、基础设施配置，都可以考虑属于自己的 DSL-Spec。
+
+---
+
+## 🤝 社区与参与
+
+- 访问 [tocoai.cn][docs-link] 获取完整文档
+- 加入 [Discord 社区][discord-link] 提问、讨论功能和分享实践
+- 在 [GitHub Issues][github-issues-link] 提交 Bug 报告或功能建议
+- 建模引擎计划于 **2026 年下半年**开源，欢迎 Star 关注
+
+没有完美的技术，只有适应的场景。毕竟 AI 改变研发才一年，但软件开发本身已经有七八十年的历史。
+
+[贡献指南 →](CONTRIBUTING.md)
+
+---
+
+<div align="center">
+
+Copyright © 2025 TocoAI. Released under the [Apache 2.0][license-link] License.
+
+</div>
+
+<!-- LINK GROUP -->
+[docs-shield]: https://img.shields.io/badge/文档-tocoai.cn-brightgreen?style=flat-square&color=73DC8C&labelColor=black
+[docs-link]: https://tocoai.cn/docs
+
+[license-shield]: https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square&color=4B78E6&labelColor=black
+[license-link]: LICENSE
+
+[stack-shield]: https://img.shields.io/badge/Stack-Java_|_Spring_Boot-orange?style=flat-square&color=ffcb47&labelColor=black
+[stack-link]: https://tocoai.cn
+
+[engine-shield]: https://img.shields.io/badge/引擎开源-2026_下半年-pink?style=flat-square&color=FA9BFA&labelColor=black
+[engine-link]: https://tocoai.cn/docs/engine
+
+[github-stars-shield]: https://img.shields.io/github/stars/tocoai/toco?style=flat-square&color=ffcb47&labelColor=black&logo=github
+[github-stars-link]: https://github.com/tocoai/toco/stargazers
+
+[github-issues-shield]: https://img.shields.io/github/issues/tocoai/toco?style=flat-square&color=ff80eb&labelColor=black&logo=github
+[github-issues-link]: https://github.com/tocoai/toco/issues
+
+[github-contributors-shield]: https://img.shields.io/github/contributors/tocoai/toco?style=flat-square&color=c4f042&labelColor=black&logo=github
+[github-contributors-link]: https://github.com/tocoai/toco/graphs/contributors
+
+[intellij-link]: https://tocoai.cn/docs/installation
+[vscode-link]: https://tocoai.cn/docs/installation-vscode
+[dsl-docs-link]: ./assets/dsl.md
+[engine-docs-link]: https://tocoai.cn/docs/engine
+[bnb-demo-link]: https://tocoai.cn/docs/your-first-toco-project
+[case-his-link]: https://tocoai.cn/cases/his
+[case-finance-link]: https://tocoai.cn/cases/finance
+[discord-link]: https://tocoai.cn/discord
