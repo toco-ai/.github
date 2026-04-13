@@ -8,7 +8,7 @@
 
 
 [![][docs-shield]][docs-link]
-[![][license-shield]][license-link]
+[![][doc-license-shield]][doc-license-link]
 [![][stack-shield]][stack-link]
 [![][engine-shield]][engine-link]
 
@@ -90,15 +90,6 @@ Server-side systems require long-term maintenance — they are more like constru
 
 Requirements and architecture design are expressed uniformly as a structured DSL-Spec, serving as the **Single Source of Truth** for the entire system. DSL-Spec is human-readable and machine-parseable. It is not a configuration file — **it is executable architectural intent**.
 
-|  | Natural Language Spec | Programmatic IaC | **DSL-Spec** |
-|--|:---------------------:|:----------------:|:------------:|
-| **Clear meaning, readable** | Anyone can read it, but ambiguity only surfaces in production incidents | Precise, but requires understanding the execution flow to grasp intent | ✅ As readable as natural language, as precise as code — ambiguity is a compile error |
-| **Clear details (What + How)** | Only vague What — How is left entirely to AI improvisation | Only How — architectural intent is buried in execution logic | ✅ What (data intent) and How (structural constraints) are both explicitly expressed |
-| **Verifiable, maintainable** | Not machine-verifiable; changing a field requires manual impact tracking | Executable but no independent intent layer; change impact requires analysis tools | ✅ Machine-parseable and verifiable; change the DSL-Spec and the engine auto-cascades all affected structures |
-| **Always consistent with code** | Accurate at launch, drifts in 3 months, becomes history in 6 | Code is the implementation, but architectural intent is lost over iterations | ✅ The relationship between Spec and code is always `=`, never `≈` |
-
-<br/>
-
 DSL-Spec covers the complete design hierarchy of server-side systems:
 
 | Layer | Elements |
@@ -174,6 +165,28 @@ RoomTypeWithRoomsDtoBaseDataAssembler.java
 
 <br/>
 
+#### DSL-Spec: The Ontology of Software Development
+
+In traditional development, testing, CI/CD, and change management each rely on different data sources — tests depend on developers' understanding of the code, CI only validates compilation and test runs, and change management relies on manual impact tracking. These processes don't truly "understand" the system; they reactively follow after code becomes fact. The core value of DSL-Spec is becoming the single Ontology of the entire development pipeline: the system's structure, rules, and relationships are defined once in the Spec, and all downstream processes derive from the same source of truth, rather than each maintaining their own approximation of reality.
+
+1. **Testing**: Business rules explicitly declared in the Spec (e.g., field constraints, enum restrictions) become the direct source of test assertions — derived from the Spec rather than reverse-engineered from code. Each Function Flow node defines clear input/output contracts through Context objects, enabling unit tests to be written independently per node without mocking the full call chain. The correctness of the engine-generated 80% of structural code is guaranteed by the engine itself, allowing test resources to focus on the 20% with actual business risk.
+
+2. **CI/CD**: Pipelines can include built-in Spec compliance checks — verifying that generated code in the codebase is fully consistent with the current Spec; any manual edits that bypass the engine trigger immediate CI failure, eliminating technical debt at the mechanism level. When model fields or relationships change, the engine simultaneously outputs DDL migration scripts, and CI enforces their sequential execution together with code deployment, eliminating the window where the database and code are out of sync. API signature changes are auto-diffed by the engine, allowing CI to determine if they constitute a breaking change and trigger interface versioning workflows accordingly.
+
+3. **Change Management**: Modifying a single aggregate field triggers the engine to automatically compute and list all affected Services, DTOs, APIs, and database tables — impact analysis derived directly from the Spec, no longer dependent on developer experience. Change reviews shift from reading code diffs to reading Spec diffs, enabling non-technical stakeholders to participate directly. Every Spec commit automatically generates a structured change record, fully tracing "who changed what and which modules were affected," which can serve directly as an audit trail for compliance purposes.
+
+<br/>
+
+|  | Natural Language Spec | Programmatic IaC | **DSL-Spec** |
+|--|:---------------------:|:----------------:|:------------:|
+| **Clear meaning, readable** | Anyone can read it, but ambiguity only surfaces in production incidents | Precise, but requires understanding the execution flow to grasp intent | ✅ As readable as natural language, as precise as code — ambiguity is a compile error |
+| **Clear details (What + How)** | Only vague What — How is left entirely to AI improvisation | Only How — architectural intent is buried in execution logic | ✅ What (data intent) and How (structural constraints) are both explicitly expressed |
+| **Verifiable, maintainable** | Not machine-verifiable; changing a field requires manual impact tracking | Executable but no independent intent layer; change impact requires analysis tools | ✅ Machine-parseable and verifiable; change the DSL-Spec and the engine auto-cascades all affected structures |
+| **Always consistent with code** | Accurate at launch, drifts in 3 months, becomes history in 6 | Code is the implementation, but architectural intent is lost over iterations | ✅ The relationship between Spec and code is always `=`, never `≈` |
+| **Ontology value for the full dev pipeline** | Cannot serve as an ontology — testing, CI, and change management each maintain their own approximation of the system | Can serve as an execution-layer ontology, but lacks an intent layer, making it hard for downstream processes to validate design intent | ✅ Unified Ontology — test assertions, DDL changes, and impact analysis all derive from the same source of truth |
+
+<br/>
+
 ### 🔧 Modeling Engine
 
 The engine covers generation of all structural code:
@@ -229,7 +242,7 @@ A complete short-term rental platform covering property management, shopping car
 
 **Business coverage:** Room inventory &nbsp;·&nbsp; Cart &nbsp;·&nbsp; Orders / Sub-orders &nbsp;·&nbsp; Payment &nbsp;·&nbsp; Points deduction &nbsp;·&nbsp; Consumption records
 
-[View full demo →][bnb-demo-link]
+[Process walkthrough →][bnb-demo-link] · [Project code →][bnb-code-link]
 
 ---
 
@@ -254,8 +267,6 @@ A complete short-term rental platform covering property management, shopping car
 **Challenge:** Business processes scattered; data and business relationships unclear; significant performance bottlenecks.
 
 **Result:** Re-modeled via DSL-Spec, making business relationships explicit; end-to-end flows traceable; system can continue iterating under the TocoAI framework.
-
-[View case details →][case-finance-link]
 
 ---
 
@@ -286,7 +297,7 @@ No technology is perfect; there are only scenarios it fits. After all, AI has on
 
 <div align="center">
 
-Copyright © 2025 TocoAI. Released under the [Apache 2.0][license-link] License.
+Copyright © 2025 TocoAI. Documentation released under [CC BY 4.0][doc-license-link].
 
 </div>
 
@@ -297,26 +308,30 @@ Copyright © 2025 TocoAI. Released under the [Apache 2.0][license-link] License.
 [license-shield]: https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square&color=4B78E6&labelColor=black
 [license-link]: LICENSE
 
+[doc-license-shield]: https://img.shields.io/badge/Docs-CC%20BY%204.0-lightgrey?style=flat-square&color=a78bfa&labelColor=black
+[doc-license-link]: https://creativecommons.org/licenses/by/4.0/
+
 [stack-shield]: https://img.shields.io/badge/Stack-Java_|_Spring_Boot-orange?style=flat-square&color=ffcb47&labelColor=black
 [stack-link]: https://tocoai.cn
 
 [engine-shield]: https://img.shields.io/badge/Engine_OSS-H2_2026-pink?style=flat-square&color=FA9BFA&labelColor=black
 [engine-link]: https://tocoai.cn/docs/engine
 
-[github-stars-shield]: https://img.shields.io/github/stars/tocoai/toco?style=flat-square&color=ffcb47&labelColor=black&logo=github
-[github-stars-link]: https://github.com/tocoai/toco/stargazers
+[github-stars-shield]: https://img.shields.io/github/stars/toco-ai/toco-ai?style=flat-square&color=ffcb47&labelColor=black&logo=github
+[github-stars-link]: https://github.com/toco-ai/toco-ai/stargazers
 
-[github-issues-shield]: https://img.shields.io/github/issues/tocoai/toco?style=flat-square&color=ff80eb&labelColor=black&logo=github
-[github-issues-link]: https://github.com/tocoai/toco/issues
+[github-issues-shield]: https://img.shields.io/github/issues/toco-ai/toco-ai?style=flat-square&color=ff80eb&labelColor=black&logo=github
+[github-issues-link]: https://github.com/toco-ai/toco-ai/issues
 
-[github-contributors-shield]: https://img.shields.io/github/contributors/tocoai/toco?style=flat-square&color=c4f042&labelColor=black&logo=github
-[github-contributors-link]: https://github.com/tocoai/toco/graphs/contributors
+[github-contributors-shield]: https://img.shields.io/github/contributors/toco-ai/toco-ai?style=flat-square&color=c4f042&labelColor=black&logo=github
+[github-contributors-link]: https://github.com/toco-ai/toco-ai/graphs/contributors
 
 [intellij-link]: https://tocoai.dev/en/docs/installation
 [vscode-link]: https://tocoai.dev/en/docs/installation-vscode
 [dsl-docs-link]: ./assets/dsl.md
 [engine-docs-link]: https://tocoai.cn/docs/engine
-[bnb-demo-link]: https://tocoai.cn/docs/your-first-toco-project
+[bnb-demo-link]: https://tocoai.dev/docs/your-first-toco-project
+[bnb-code-link]: https://github.com/toco-ai/homestay
 [case-his-link]: https://tocoai.cn/cases/his
 [case-finance-link]: https://tocoai.cn/cases/finance
-[discord-link]: https://tocoai.cn/discord
+[discord-link]: https://discord.gg/NubsdbF3MK
