@@ -25,7 +25,7 @@
 > This document is the detailed expansion of the **"Real-World Case: Large-Scale Hospital HIS"** section from the [TocoAI main README](../README.md). If you have just finished reading the main doc and are curious how DSL-Spec, the modeling engine, and FuncFlow look in real-world business scenarios, this case study is for you.
 
 > [!NOTE]
-> This case study focuses on **architecture design and code delivery**, not installation or configuration tutorials. We recommend going through the [BnB demo project](https://tocoai.cn/docs/your-first-toco-project) first to understand basic concepts like DTO, WritePlan, and ReadPlan for a smoother reading experience.
+> This case study focuses on **architecture design and code delivery**, not installation or configuration tutorials. We recommend going through the [BnB demo project](https://tocoai.dev/docs/your-first-toco-project) first to understand basic concepts like DTO, WritePlan, and ReadPlan for a smoother reading experience.
 
 <details>
 <summary><kbd>Table of Contents</kbd></summary>
@@ -751,4 +751,4 @@ TocoAI's core difference is not "what percentage of code is written by AI," but 
 [stack-detail]: #-case-overview
 [main-readme]: ../README.md
 [dsl-ref]: ../assets/dsl.md
-[bnb-demo]: https://tocoai.cn/docs/your-first-toco-project
+[bnb-demo]: https://tocoai.dev/docs/your-first-toco-project
