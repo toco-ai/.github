@@ -120,7 +120,7 @@ erDiagram
         string document_number "入库单号（业务唯一）"
         string storage_code FK "库房编码"
         string supplier_id FK "供应商ID"
-        enum accountant_status "过账/记账状态"
+        enum accountant_status "过账状态"
         datetime accountant_date_time "过账时间"
         boolean red_flag "退货/负向调整标志"
     }
@@ -332,7 +332,7 @@ erDiagram
 > [!NOTE]
 > `search_drug_import` 读方案与写方案共享同一套领域模型，主要服务于入库单列表页、状态筛选等查询场景，展示了 TocoAI 对多表 Join、子查询和分页的支持。
 
-建模引擎自动生成 `SearchDrugImportQto.java`、QueryService、DAO、MyBatis SQL 及 DTO/VO 转换代码，读方案约 **1300 行**，核心文件包括：
+建模引擎自动生成 `SearchDrugImportQto.java`、QueryService、DAO、MyBatis SQL 及 DTO/VO 转换代码等完整读链路代码，读方案约 **1300 行**，核心文件包括：
 
 - `SearchDrugImportQto.java` / `SearchDrugImportQtoDao.java`（查询对象与 SQL）
 - `DrugImportWithDetailDtoQueryService.java`（查询服务）
@@ -392,6 +392,7 @@ graph LR
 >
 > <p align="center">
 >   <img src="../assets/tocoai-funcflow-designer-screenshot.png" alt="TocoAI 可视化 FuncFlow 编排界面" width="90%" />
+<img src="../assets/tocoai-funcflow-designer-screenshot.png" alt="TocoAI 可视化 FuncFlow 编排界面" width="90%" />  
 >   <br/>
 >   <em>图 4：TocoAI 可视化平台中的 FuncFlow 编排界面</em></p>
 
@@ -401,7 +402,7 @@ graph LR
 | 2 | `drug_billing` | 过账并触发库存核算子流程 | ~500+ 行 |
 | 3 | `accounting_drug_inventory_flow` | 按药品产地分组处理库存核算 | ~430 行  |
 
-以下时序图展示了核心接口的完整调用链路：
+以下时序图展示了核心接口的调用链路：
 
 ```mermaid
 sequenceDiagram
@@ -706,12 +707,13 @@ public class SaveDrugOriginInventoryNode extends NodeComponent {
 > 统计口径：800+ 功能页面，整体研发效率提升约 **300%+**。
 
 <a id="ai-tools-comparison"></a>
+<a id="ai 工具比较"></a>  
 
 ### 🤖 与通用 AI 工具对比
 
-TocoAI 的核心差异不在于"AI 写代码的比例"，而在于**代码生成范式**：通用 AI 工具（如 Cursor、GitHub Copilot）依赖 Prompt 和开发者经验进行代码补全，而 TocoAI 通过 **DSL-Spec → 建模引擎** 确定性生成结构性代码。
+TocoAI 的核心差异不在于"AI 写代码的比例"，而在于**代码生成范式**：通用 AI 工具（如 Cursor、Claude Code）依赖 Prompt 和开发者经验进行代码补全，而 TocoAI 通过 **DSL-Spec → 建模引擎** 确定性生成结构性代码。
 
-| 指标 | 通用 AI 编程工具（如 Cursor / Copilot） | TocoAI |
+| 指标 | 通用 AI 编程工具（如 Cursor / Claude Code） | TocoAI |
 |:---|:---|:---|
 | AI 代码采纳率 | ~60%-70% | **近 97%** |
 | 结构性代码来源 | 依赖人工编写 + AI 辅助补全 | **建模引擎稳态生成 ~80%** |
