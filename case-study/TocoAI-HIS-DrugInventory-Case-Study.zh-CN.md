@@ -1,19 +1,19 @@
 <div align="center">
 
-<a name="top"></a>
+<a id="top"></a>
 
 # 🏥 TocoAI 案例：HIS 药库管理的领域工程实践
 
 <h3>大型医院信息系统药库模块的 Harness Engineering 落地实录</h3>
 
-[![][scale-shield]][scale-detail]
-[![][efficiency-shield]][efficiency-detail]
-[![][adoption-shield]][adoption-detail]
-[![][stack-shield]][stack-detail]
+[![项目规模][scale-shield]][scale-detail]
+[![效率提升][efficiency-shield]][efficiency-detail]
+[![AI 采纳率][adoption-shield]][adoption-detail]
+[![技术栈][stack-shield]][stack-detail]
 
 <br/>
 
-[← 返回主 README](../README.md) · [DSL 语法参考](../assets/dsl.md) · [BnB 演示 →](https://tocoai.cn/docs/your-first-toco-project)
+[← 返回主 README][main-readme] · [DSL 语法参考][dsl-ref] · [BnB 演示 →][bnb-demo]
 
 </div>
 
@@ -50,6 +50,9 @@
 
 ---
 
+> [!TIP]
+> **TL;DR**：本案例展示 TocoAI 如何在一个 120+ 模块的大型医院 HIS 系统中，通过 DSL-Spec 和建模引擎完成药库管理模块的架构落地。核心接口 `POST /api/drug-inventory/merge-drug-import-billing` 的 80% 结构性代码由引擎稳态生成，剩余 20% 的业务逻辑由 AI 辅助生成、开发者审阅确认，最终 AI 代码采纳率近 97%。
+
 <a id="overview"></a>
 
 ## 📋 案例概览
@@ -62,8 +65,6 @@
 | **核心接口** | `POST /api/drug-inventory/merge-drug-import-billing`（保存入库单并过账） |
 | **技术范式** | DSL-Spec 定义架构 → 建模引擎生成 80% 结构代码 → AI+开发者完成 20% 业务逻辑 |
 
-本案例是 TocoAI **Harness Engineering** 思路的落地实践：**通过 DSL-Spec 定义领域模型和流程结构，由建模引擎稳态生成约 80% 的结构性代码，剩余 20% 的业务逻辑由 AI 辅助生成、开发者审阅确认**——让 AI 始终是人的助理，而不是主人。
-
 > [!NOTE]
 > **关于代码**：本案例源于真实商业落地项目，文中展示的 DSL-Spec、ER 图和代码片段为教学展示已精简，部分敏感字段和完整源码未公开。
 
@@ -73,7 +74,7 @@
 
 ## 🏥 场景与痛点
 
-药库是药品供应链的核心枢纽，负责药品从入库、库存、出库到核算的全生命周期管理。整个 HIS 项目包含 **120+ 核心业务模块、200+ 业务流程**，本文不遍历所有模块，而是**以小见大**——通过一个典型、复杂的 `入库单保存并过账` 接口，完整展示 TocoAI 在真实业务中的实现链路。
+药库是药品供应链的核心枢纽，负责药品从入库、库存、出库到核算的全生命周期管理。本文**以小见大**——通过一个典型、复杂的 `入库单保存并过账` 接口，完整展示 TocoAI 在真实业务中的实现链路。
 
 <a id="requirements"></a>
 
@@ -108,7 +109,7 @@
 
 ### 📐 领域模型
 
-以下 ER 图展示了与该接口直接相关的 8 张核心表及其关联关系：
+以下 ER 图展示了与该接口直接相关的 8 张核心表及其关联关系、关键字段：
 
 ```mermaid
 erDiagram
@@ -219,11 +220,14 @@ erDiagram
 ```
 
 > [!NOTE]
-> **📊 ER 图说明**：上图展示与该接口直接相关的 **8 张核心表**及其关键字段。`drug_detail_ledger`（drug_report 模块）和 `drug_price_contrast`（drug_financial 模块）为跨模块 Entity，通过 RPC 方式调用。
+> `drug_detail_ledger`（drug_report 模块）和 `drug_price_contrast`（drug_financial 模块）为跨模块 Entity，通过 RPC 方式调用。
 >
-> 下图展示了该领域模型在 **TocoAI 可视化设计平台** 中的真实设计界面：
+> 下图是 TocoAI 可视化平台中的实际设计界面：
 >
-> ![TocoAI 可视化领域模型设计平台](../assets/tocoai-er-designer-screenshot.png)
+> <p align="center">
+>   <img src="../assets/tocoai-er-designer-screenshot.png" alt="TocoAI 可视化领域模型设计平台" width="90%" />
+>   <br/>
+>   <em>图 1：TocoAI 可视化平台中的 ER 模型设计界面</em></p>
 
 **核心聚合**：
 
@@ -248,13 +252,7 @@ erDiagram
 
 `drug_inventory_circulation_detail` 具有独立的查询场景（流水追溯、审计报表）和生命周期，可视作库存核算过程产生的**领域事件落盘**。
 
-**核心关系链路**：
-- **入库明细 → 批次库存**：`drug_import_detail.batch_inventory_id` → `drug_origin_batch_inventory.id`（过账后回填）
-- **批次库存 → 批次元信息**：`drug_origin_batch_inventory.batch_id` → `drug_inventory_batch.id`（弱引用）
-- **批次库存 → 总库存**：`drug_origin_batch_inventory.inventory_id` → `drug_origin_inventory.id`
-- **流通明细 → 出入库明细**：`drug_inventory_circulation_detail.drug_import_detail_id` / `drug_export_detail_id`
-- **明细账 → 业务单据**：`drug_detail_ledger.business_document_id` 配合 `export_import_id` 确定业务类型
-- **价格对照 → 药品产地/规格**：`drug_price_contrast.drug_origin_code` / `package_origin_specification_id` / `package_specification_price` / `min_specification_id` / `min_origin_specification_price`
+**核心关系链路**：入库明细过账后通过 `batch_inventory_id` 回填批次库存；批次库存通过 `batch_id` 弱引用批次元信息；流通明细记录出入库流水；明细账和价格对照分别通过 RPC 与 drug_report、drug_financial 模块交互。
 
 </details>
 
@@ -296,18 +294,21 @@ erDiagram
 ```
 
 > [!NOTE]
-> **字段列表说明：** 上述 JSON 为教学展示已精简，实际 WritePlan 包含 drug_import 的 35 个字段和 drug_import_detail 的 52 个字段（含通用审计字段），完整 Spec 由 TocoAI 可视化设计平台定义。
+> 上述 JSON 为教学展示已精简，实际 WritePlan 包含 drug_import 的 35 个字段和 drug_import_detail 的 52 个字段（含通用审计字段），完整 Spec 由 TocoAI 可视化设计平台定义。
 
-建模引擎自动生成 `MergeDrugImportBto.java` 及完整写链路代码，仅这一个写方案约 **5600 行**，核心文件包括：
+建模引擎自动生成 `MergeDrugImportBto.java` 及完整写链路代码，该写方案约 **5600 行**，核心文件包括：
 
 - `MergeDrugImportBto.java`（约 1000 行）
 - `DrugImportBOService.java`（约 930 行）
 - `BaseDrugImportBOService.java`（约 3670 行）
 - `DrugImportBO.java`（约 40 行）
 
-下图展示了 `merge_drug_import` 写方案在 **TocoAI 可视化设计平台** 中的真实配置界面：
+`merge_drug_import` 写方案在可视化平台中的配置截图如下：
 
-![TocoAI 可视化 WritePlan 配置界面](../assets/tocoai-writeplan-designer-screenshot.png)
+<p align="center">
+  <img src="../assets/tocoai-writeplan-designer-screenshot.png" alt="TocoAI 可视化 WritePlan 配置界面" width="90%" />
+  <br/>
+  <em>图 2：TocoAI 可视化平台中的 WritePlan 配置界面</em></p>
 
 #### QTO 读方案
 
@@ -329,27 +330,30 @@ erDiagram
 ```
 
 > [!NOTE]
-> **说明**：`search_drug_import` 读方案与写方案共享同一套领域模型，主要服务于入库单列表页、状态筛选等查询场景，展示了 TocoAI 对多表 Join、子查询和分页的支持。
+> `search_drug_import` 读方案与写方案共享同一套领域模型，主要服务于入库单列表页、状态筛选等查询场景，展示了 TocoAI 对多表 Join、子查询和分页的支持。
 
-建模引擎自动生成 `SearchDrugImportQto.java`、QueryService、DAO、MyBatis SQL 及 DTO/VO 转换代码，仅这一个读方案约 **1300 行**，核心文件包括：
+建模引擎自动生成 `SearchDrugImportQto.java`、QueryService、DAO、MyBatis SQL 及 DTO/VO 转换代码，读方案约 **1300 行**，核心文件包括：
 
 - `SearchDrugImportQto.java` / `SearchDrugImportQtoDao.java`（查询对象与 SQL）
 - `DrugImportWithDetailDtoQueryService.java`（查询服务）
 - `DrugImportWithDetailDto.java` / `Vo` / `Converter`（DTO/VO 转换）
 
-下图展示了 `search_drug_import` 读方案在 **TocoAI 可视化设计平台** 中的真实配置界面：
+对应的读方案配置界面：
 
-![TocoAI 可视化 ReadPlan 配置界面](../assets/tocoai-readplan-designer-screenshot.png)
+<p align="center">
+  <img src="../assets/tocoai-readplan-designer-screenshot.png" alt="TocoAI 可视化 ReadPlan 配置界面" width="90%" />
+  <br/>
+  <em>图 3：TocoAI 可视化平台中的 ReadPlan 配置界面</em></p>
 
 <a id="flow-orchestration"></a>
 
 ### 🔄 流程编排
 
-入库单保存并过账被拆解为 3 个 Flow（即 FuncFlow），由 `DrugInventoryFlowService` 统一编排：
+针对上述三大挑战，入库单保存并过账被拆解为 3 个 FuncFlow，由 `DrugInventoryFlowService` 统一编排。各阶段核心动作与开发者补充代码量如下：
 
 ```mermaid
 graph LR
-    subgraph merge_drug_import_flow [Flow1&#58; merge_drug_import_flow 保存入库单]
+    subgraph merge_drug_import_flow ["Flow1: merge_drug_import_flow 保存入库单"]
         direction TB
         Start1([开始]) --> A{校验入库单报表数据}
         A -- 通过 --> B{校验创建前置条件}
@@ -360,7 +364,7 @@ graph LR
 
     D --> E
 
-    subgraph drug_billing [Flow2&#58; drug_billing 入库单过账]
+    subgraph drug_billing ["Flow2: drug_billing 入库单过账"]
         direction TB
         E{校验过账前置条件} -- 通过 --> F[入库单过账]
         F --> G[创建库存批次]
@@ -375,7 +379,7 @@ graph LR
 
     H -. 内部调用 .-> N
 
-    subgraph accounting_drug_inventory_flow [Flow3&#58; accounting_drug_inventory_flow 库存核算]
+    subgraph accounting_drug_inventory_flow ["Flow3: accounting_drug_inventory_flow 库存核算"]
         direction TB
         N{校验核算数据} -- 通过 --> O[组装库存核算数据]
         N -- 不通过 --> P[失败提示]
@@ -384,9 +388,12 @@ graph LR
 ```
 
 > [!NOTE]
-> 下图展示了 `drug_billing` 流程在 **TocoAI 可视化流程编排平台** 中的真实设计界面：
+> `drug_billing` 流程在可视化编排平台中的设计效果：
 >
-> ![TocoAI 可视化 FuncFlow 编排界面](../assets/tocoai-funcflow-designer-screenshot.png)
+> <p align="center">
+>   <img src="../assets/tocoai-funcflow-designer-screenshot.png" alt="TocoAI 可视化 FuncFlow 编排界面" width="90%" />
+>   <br/>
+>   <em>图 4：TocoAI 可视化平台中的 FuncFlow 编排界面</em></p>
 
 | 阶段 | Flow | 核心动作 |  开发者补充  |
 |:---:|:---|:---|:-------:|
@@ -394,7 +401,7 @@ graph LR
 | 2 | `drug_billing` | 过账并触发库存核算子流程 | ~500+ 行 |
 | 3 | `accounting_drug_inventory_flow` | 按药品产地分组处理库存核算 | ~430 行  |
 
-以下时序图展示了核心接口的调用时序与事务边界：
+以下时序图展示了核心接口的完整调用链路：
 
 ```mermaid
 sequenceDiagram
@@ -465,6 +472,7 @@ modules/drug_inventory/
 `MergeDrugImportBto.java` 从 `merge_drug_import` 写方案自动生成，**禁止手动修改**：
 
 ```java
+// service/{module-java}/service/bto/MergeDrugImportBto.java
 @Getter
 @NoArgsConstructor
 public class MergeDrugImportBto {
@@ -500,9 +508,10 @@ public class MergeDrugImportBto {
 
 ### 🎮 Controller（开发者扩展）
 
-以下为核心过账接口。`@AutoGenerated(locked = false)` 表示开发者可在生成骨架内补充逻辑：
+`DrugImportCustomBOController` 使用 `@AutoGenerated(locked = false)`，开发者可在生成骨架内补充业务逻辑：
 
 ```java
+// entrance/web/{module-java}/entrance/web/controller/DrugImportCustomBOController.java
 @Controller
 @Validated
 public class DrugImportCustomBOController {
@@ -544,6 +553,7 @@ public class DrugImportCustomBOController {
 <summary>🔍 前置校验节点：ValidateCreateDrugImportPreconditionNode</summary>
 
 ```java
+// service/{module-java}/service/flow/node/merge_drug_import_flow/ValidateCreateDrugImportPreconditionNode.java
 @Component("drugInventory-mergeDrugImportFlow-validateCreateDrugImportPrecondition")
 public class ValidateCreateDrugImportPreconditionNode extends NodeIfComponent {
 
@@ -575,6 +585,7 @@ public class ValidateCreateDrugImportPreconditionNode extends NodeIfComponent {
 <summary>🔍 过账节点：DrugBillingNode</summary>
 
 ```java
+// service/{module-java}/service/flow/node/drug_billing/DrugBillingNode.java
 @Component("drugInventory-drugBilling-drugBilling")
 public class DrugBillingNode extends NodeComponent {
 
@@ -617,6 +628,7 @@ public class DrugBillingNode extends NodeComponent {
 <summary>🔍 库存核算节点：SaveDrugOriginInventoryNode</summary>
 
 ```java
+// service/{module-java}/service/flow/node/drug_billing/SaveDrugOriginInventoryNode.java
 @Component("drugInventory-drugBilling-saveDrugOriginInventory")
 public class SaveDrugOriginInventoryNode extends NodeComponent {
 
@@ -670,7 +682,7 @@ public class SaveDrugOriginInventoryNode extends NodeComponent {
 
 </details>
 
-<div align="right"><a href="#-TocoAI-案例：HIS-药库管理的领域工程实践">⬆️ 回到顶部</a></div>
+<div align="right"><a href="#top">⬆️ 回到顶部</a></div>
 
 ---
 
@@ -691,7 +703,7 @@ public class SaveDrugOriginInventoryNode extends NodeComponent {
 | 新人熟悉全局时间 | 2-3 个月 | **1-2 周** | 明显缩短 |
 
 > [!NOTE]
-> **数据背景**：800+ 功能页面；整体研发效率提升约 **300%+**。
+> 统计口径：800+ 功能页面，整体研发效率提升约 **300%+**。
 
 <a id="ai-tools-comparison"></a>
 
@@ -705,7 +717,7 @@ TocoAI 的核心差异不在于"AI 写代码的比例"，而在于**代码生成
 | 结构性代码来源 | 依赖人工编写 + AI 辅助补全 | **建模引擎稳态生成 ~80%** |
 | 设计-代码一致性 | 随开发者经验和 Prompt 波动 | DSL 驱动，设计即代码 |
 
-**关键收益**：确定性生成消除了 Prompt 漂移风险，设计即代码保证了可维护性，而单一事务边界和职责分离的节点设计则提升了系统安全性。
+**关键收益**：确定性生成消除了 Prompt 漂移风险，DSL 驱动保证了设计即代码的可维护性；职责分离的节点设计进一步提升了系统的长期稳定性。
 
 > [!IMPORTANT]
 > **局限性与适用边界：**<br>
@@ -720,7 +732,7 @@ TocoAI 的核心差异不在于"AI 写代码的比例"，而在于**代码生成
 
 <div align="center">
 
-[← 回到 TocoAI 主 README](../README.md) · [📐 查看 DSL-Spec 语法参考](../assets/dsl.md) · [🏠 查看完整演示案例：BnB 民宿预订系统](https://tocoai.cn/docs/your-first-toco-project)
+[← 回到 TocoAI 主 README][main-readme] · [📐 查看 DSL-Spec 语法参考][dsl-ref] · [🏠 查看完整演示案例：BnB 民宿预订系统][bnb-demo]
 
 </div>
 
@@ -735,3 +747,6 @@ TocoAI 的核心差异不在于"AI 写代码的比例"，而在于**代码生成
 [adoption-detail]: #-与通用-ai-工具对比
 [stack-shield]: https://img.shields.io/badge/技术栈-Java%20%7C%20Spring%20Boot-orange?style=flat-square&color=ffcb47&labelColor=black
 [stack-detail]: #-案例概览
+[main-readme]: ../README.md
+[dsl-ref]: ../assets/dsl.md
+[bnb-demo]: https://tocoai.cn/docs/your-first-toco-project
