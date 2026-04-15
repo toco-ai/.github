@@ -154,7 +154,7 @@ erDiagram
 >
 > 下图展示了该领域模型在 **TocoAI 可视化设计平台** 中的真实设计界面：
 >
-> ![TocoAI 可视化领域模型设计平台](./assets/tocoai-er-designer-screenshot.png)
+> ![TocoAI 可视化领域模型设计平台](../assets/tocoai-er-designer-screenshot.png)
 
 **核心聚合**：
 
@@ -236,7 +236,7 @@ erDiagram
 
 下图展示了 `merge_drug_import` 写方案在 **TocoAI 可视化设计平台** 中的真实配置界面：
 
-![TocoAI 可视化 WritePlan 配置界面](./assets/tocoai-writeplan-designer-screenshot.png)
+![TocoAI 可视化 WritePlan 配置界面](../assets/tocoai-writeplan-designer-screenshot.png)
 
 #### QTO 读方案
 
@@ -267,7 +267,7 @@ erDiagram
 
 下图展示了 `search_drug_import` 读方案在 **TocoAI 可视化设计平台** 中的真实配置界面：
 
-![TocoAI 可视化 ReadPlan 配置界面](./assets/tocoai-readplan-designer-screenshot.png)
+![TocoAI 可视化 ReadPlan 配置界面](../assets/tocoai-readplan-designer-screenshot.png)
 
 ---
 
@@ -313,7 +313,7 @@ graph LR
 
 > 下图展示了 `drug_billing` 流程在 **TocoAI 可视化流程编排平台** 中的真实设计界面：
 >
-> ![TocoAI 可视化 FuncFlow 编排界面](./assets/tocoai-funcflow-designer-screenshot.png)
+> ![TocoAI 可视化 FuncFlow 编排界面](../assets/tocoai-funcflow-designer-screenshot.png)
 
 | 阶段 | Flow | 核心动作 | 开发者补充 |
 |------|------|----------|------------|
